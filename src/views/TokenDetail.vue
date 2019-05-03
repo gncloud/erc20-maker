@@ -106,8 +106,7 @@ export default {
         }
         this.instance = this.web3.eth.contract(sampleABI).at(this.token.id)
         this.getTokenSummary()
-        this.getTokenTxCount()
-        this.getToken()
+        this.getTokenDate()
     },
     methods: {
         async getTokenSummary() {
@@ -125,7 +124,7 @@ export default {
             console.log('contract >> ', await this.instance)
             console.log('web3 >>', await this.web3)
         },
-        async getTokenTxCount() {
+        async getTokenDate() {
             let url = `https://blockscout.com/eth/ropsten/api?module=account&action=txlist&address=${this.token.id}&offset=10`
             let res = await fetch(url)
             let body = await res.json()
@@ -137,13 +136,13 @@ export default {
             this.token.date += ((tmpDate.getMonth() + 1) <= 10 ? '0' + (tmpDate.getMonth() + 1) : tmpDate.getMonth() + 1) + '.'
             this.token.date += (tmpDate.getDate() <= 10 ? '0' + tmpDate.getDate() : tmpDate.getDate())
         },
-        async getToken() {
-            // TEST
-            let url = `https://blockscout.com/eth/ropsten/api?module=token&action=getToken&contractaddress=${this.token.id}`
-            let res = await fetch(url)
-            let body = await res.json()
-            console.log(body)
-        }
+        // async getToken() {
+        //     // TEST
+        //     let url = `https://blockscout.com/eth/ropsten/api?module=token&action=getToken&contractaddress=${this.token.id}`
+        //     let res = await fetch(url)
+        //     let body = await res.json()
+        //     console.log(body)
+        // }
     }
 }
 </script>
