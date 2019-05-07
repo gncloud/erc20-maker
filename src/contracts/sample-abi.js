@@ -452,24 +452,5 @@ module.exports = [
     ],
     "name": "Approval",
     "type": "event"
-  },
-  {
-    "constant": true,
-    "inputs": [
-      {
-        "name": "owner",
-        "type": "address"
-      }
-    ],
-    "name": "balanceOf",
-    "outputs": [
-      {
-        "name": "",
-        "type": "uint256"
-      }
-    ],
-    "payable": false,
-    "stateMutability": "view",
-    "type": "function"
   }
 ]

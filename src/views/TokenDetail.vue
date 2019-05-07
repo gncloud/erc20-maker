@@ -42,8 +42,8 @@
             <tr>
                 <th>컨트랙트</th>
                 <td>
-                    <a ref="address" target="_black">
-                        {{token.addressText}}
+                    <a ref="idLink" target="_black">
+                        {{token.idText}}
                     </a>
                 </td>
             </tr>
@@ -53,10 +53,8 @@
                     <a ref="owner" target="_black">
                         {{token.ownerText}}
                     </a>
-                    
                 </td>
             </tr>
-            
         </table>
 
         <div class="mastfoot mt-5">
@@ -80,11 +78,9 @@ export default {
     data() {
         return {
             web3: null,
-            instance: null,
             token: {
                 id: null,
-                address: null,
-                addressText: null,
+                idText: null,
                 name: null,
                 symbol: null,
                 totalSupply: null,
@@ -99,49 +95,112 @@ export default {
     },
     created() {
         this.token.id = this.$route.params.token
-        this.web3 = new Web3(new Web3.providers.HttpProvider(Utils.getWeb3Url()))
-        if (!this.web3.isConnected()) {
-            alert('네트워크 연결 실패.')
-            return
-        }
-        this.instance = this.web3.eth.contract(sampleABI).at(this.token.id)
-        this.getTokenSummary()
-        this.getTokenDate()
+        this.web3 = new Web3(new Web3.providers.HttpProvider('http://localhost:7545'))
+        this.getTokenSummary(this.getInstance())
+        // this.getTokenDate()
+        // this.deployTest()
     },
     methods: {
-        async getTokenSummary() {
-            this.token.name = await this.instance['name']() || ''
-            this.token.symbol = await this.instance['symbol']() || ''
-            this.token.totalSupply = Utils.comma(await this.instance['totalSupply']() || 0)
-            this.token.decimals = Utils.comma(await this.instance['decimals']() || 0)
-            this.token.address = await this.instance['address']
-            this.$refs.address.setAttribute('href', Utils.link('address', this.token.address))
-            this.token.addressText = Utils.shortHash(this.token.address)
-
-            this.token.owner = await this.instance['owner']()
-            this.$refs.owner.setAttribute('href', Utils.link('address', this.token.owner))
-            this.token.ownerText = Utils.shortHash(this.token.owner)
-            console.log('contract >> ', await this.instance)
-            console.log('web3 >>', await this.web3)
+        getInstance() {
+            return new this.web3.eth.Contract(sampleABI, this.token.id)
         },
-        async getTokenDate() {
-            let url = `https://blockscout.com/eth/ropsten/api?module=account&action=txlist&address=${this.token.id}&offset=10`
-            let res = await fetch(url)
-            let body = await res.json()
+        async getTokenSummary(instance) {
+            this.token.name        = await instance.methods.name().call()
+            this.token.symbol      = await instance.methods.symbol().call()
+            this.token.owner       = await instance.methods.owner().call()
+            this.token.totalSupply = Utils.comma(await instance.methods.totalSupply().call() || 0)
+            this.token.decimals    = Utils.comma(await instance.methods.decimals().call() || 0)
             
-            this.token.timeStamp = body.result[0].timeStamp
-            let tmpDate = new Date()
-            tmpDate.setTime(Number(body.result[0].timeStamp) * 1000)
-            this.token.date = tmpDate.getFullYear() + '.'
-            this.token.date += ((tmpDate.getMonth() + 1) <= 10 ? '0' + (tmpDate.getMonth() + 1) : tmpDate.getMonth() + 1) + '.'
-            this.token.date += (tmpDate.getDate() <= 10 ? '0' + tmpDate.getDate() : tmpDate.getDate())
+            this.$refs.idLink.setAttribute('href', Utils.link('address', this.token.id))
+            this.$refs.owner.setAttribute('href', Utils.link('address', this.token.owner))
+            
+            this.token.idText = Utils.shortHash(this.token.id)
+            this.token.ownerText = Utils.shortHash(this.token.owner)
+
+            try {
+                let res = await fetch(`https://blockscout.com/eth/ropsten/api?module=account&action=txlist&offset=10&address=${this.token.id}`)
+                let body = await res.json()
+                this.token.timeStamp = body.result[0].timeStamp
+                this.token.date = Utils.timeStampToDate(Number(this.token.timeStamp) * 1000)
+            } catch(e) {
+                this.token.date = Utils.timeStampToDate(new Date().getTime())
+            }
         },
-        // async getToken() {
-        //     // TEST
-        //     let url = `https://blockscout.com/eth/ropsten/api?module=token&action=getToken&contractaddress=${this.token.id}`
-        //     let res = await fetch(url)
-        //     let body = await res.json()
-        //     console.log(body)
+        // async deployTest() {
+        //     let from = '0x430d4b747080A78F362D5F9E711215Ccd08e364a'
+        //     let name = 'TESTNAME'
+        //     let symbol = 'TEST'
+        //     let decimals = 0
+        //     let totalSupply = 1000000000
+        //     let initSupply = 0
+            
+        //     let gasLimit = 6721975
+        //     let gasPrice = 20000000000
+            
+        //     const { abi, bytecode } = require('../templates/newTokenTemplate')
+        //     const newContract = new this.web3.eth.Contract(
+        //         abi, 
+        //         '',
+        //         { data: bytecode }
+        //     )
+        //     newContract.transactionConfirmationBlocks = 1;
+            
+        //     newContract.deploy({
+        //             data: bytecode,
+        //             arguments: [name, symbol, decimals, totalSupply]
+        //         }).send({
+        //                 from: from, 
+        //                 gas: gasLimit,
+        //                 gasPrice: gasPrice
+        //             })
+        //             .then((clonedContract) => {
+        //             this.$log.debug('clonedContract', clonedContract)
+        //             this.$log.debug('contract address >> ', clonedContract.options.address)
+        //             newContract.methods.transfer('0x430d4b747080A78F362D5F9E711215Ccd08e364a', 1000)
+        //                 .send({from: '0x430d4b747080A78F362D5F9E711215Ccd08e364a', gas: gasLimit})
+        //                 .on('transactionHash', (hash) => {
+        //                     this.$log.debug('--- TRANSACTION_HASH ---')
+        //                     this.$log.debug(hash)
+        //                 })
+        //                 .on('confirmation', (confirmations, receipt) => {
+        //                     this.$log.debug('--- CONFIRMATION ---')
+        //                     this.$log.debug(confirmations)
+        //                     this.$log.debug(receipt)
+        //                 })
+        //                 .on('receipt', (receipt) => {
+        //                     this.$log.debug('--- RECEIPT ---')
+        //                     this.$log.debug(receipt)
+        //                 })
+        //                 .on('error', (error, receipt, confirmations) => {
+        //                     this.$log.debug('--- ERROR ---')
+        //                     this.$log.debug(error)
+        //                     this.$log.debug(receipt)
+        //                     this.$log.debug(confirmations)
+        //                 })
+        //         })
+        // },
+        // transfer(contract, from, value) {
+        //     contract.methods.transfer('0x430d4b747080A78F362D5F9E711215Ccd08e364a', 1000)
+        //         .send({from: '0xcc98DA5aD5a816Be6FaE64C71B708BD1EEF017c4', gas: gasLimit})
+        //         .on('transactionHash', (hash) => {
+        //             this.$log.debug('--- TRANSACTION_HASH ---')
+        //             this.$log.debug(hash)
+        //         })
+        //         .on('confirmation', (confirmations, receipt) => {
+        //             this.$log.debug('--- CONFIRMATION ---')
+        //             this.$log.debug(confirmations)
+        //             this.$log.debug(receipt)
+        //         })
+        //         .on('receipt', (receipt) => {
+        //             this.$log.debug('--- RECEIPT ---')
+        //             this.$log.debug(receipt)
+        //         })
+        //         .on('error', (error, receipt, confirmations) => {
+        //             this.$log.debug('--- ERROR ---')
+        //             this.$log.debug(error)
+        //             this.$log.debug(receipt)
+        //             this.$log.debug(confirmations)
+        //         })
         // }
     }
 }

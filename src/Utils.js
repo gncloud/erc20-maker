@@ -33,6 +33,13 @@ class Utils {
             return hash
         }
     }
+    timeStampToDate(timeStamp) {
+        let tmpDate = new Date()
+        tmpDate.setTime(Number(timeStamp))
+        return tmpDate.getFullYear() + '.' + 
+        ((tmpDate.getMonth() + 1) <= 10 ? '0' + (tmpDate.getMonth() + 1) : tmpDate.getMonth() + 1) + '.' +
+        (tmpDate.getDate() <= 10 ? '0' + tmpDate.getDate() : tmpDate.getDate())
+    }
 }
 
 export default new Utils()
