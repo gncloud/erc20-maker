@@ -218,10 +218,10 @@ export default {
                 alert('이름의 길이가 안맞습니다.')
                 return false
             }
-            // if (!/[^a-zA-Z-\\s]+/.test(this.name)) {
-            //     alert('이름은 영문자로 작성해주세요. 공백, 하이픈도 가능합니다.')
-            //     return false
-            // }
+            if (/[^a-zA-Z- ]+/.test(this.name)) {
+                alert('이름은 영문자로 작성해주세요. 공백, 하이픈도 가능합니다.')
+                return false
+            }
             if (this.symbol === '' || this.symbol.length < 3 && 10 < this.symbol.length) {
                 alert('심볼의 길이가 안맞습니다.')
                 return false

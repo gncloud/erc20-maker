@@ -1,0 +1,22 @@
+.cover-container {
+    max-width: 42em !important;
+}
+.eth-logo {
+    background-image: url(/img/ethereum-ci.png);
+    background-size: 100px;
+    background-repeat: no-repeat;
+    background-position: center;
+    width: 100%;
+    height: 80px;
+    margin-top: 20px;
+}
+.service-name {
+    font-size: 1.2em;
+    font-weight: bold;
+}
+.main-coin-text {
+    font-size: 60px;
+}
+.mastfoot {
+    bottom: 1em;
+}

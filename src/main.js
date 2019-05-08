@@ -6,6 +6,7 @@ import LoggerConfig from './Logger'
 import BootstrapVue from 'bootstrap-vue'
 import 'bootstrap/dist/css/bootstrap.css'
 import 'bootstrap-vue/dist/bootstrap-vue.css'
+import './global.css'
 
 Vue.config.productionTip = false
 Vue.use(BootstrapVue)

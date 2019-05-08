@@ -2,10 +2,12 @@
     <b-container class="text-center cover-container" 
                  v-if="token.symbol !== undefined">
         
-        <div class="eth-logo"></div>
-        <div>
-            <span class="service-name">토큰 생성</span>
-        </div>
+        <a href="/tokens" class="link-no-style">
+            <div class="eth-logo"></div>
+            <div>
+                <span class="service-name">토큰 생성</span>
+            </div>
+        </a>
 
         <div class="mt-5 text-left">아래 내용이 맞는지 검토하세요.</div>
         <table class="table text-left">
@@ -153,3 +155,12 @@ export default {
     }
 }
 </script>
+<style scoped>
+.link-no-style,
+.link-no-style:hover,
+.link-no-style:active,
+.link-no-style::before {
+    color: black;
+    text-decoration-line: none;
+}
+</style>

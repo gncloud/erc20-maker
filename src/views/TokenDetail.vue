@@ -1,10 +1,12 @@
 <template>
     <b-container class="text-center cover-container">
         
-        <div class="eth-logo"></div>
-        <div>
-            <span class="service-name">ERC-20 Token Maker</span>
-        </div>
+        <a href="/tokens" class="link-no-style">
+            <div class="eth-logo"></div>
+            <div>
+                <span class="service-name">ERC-20 Token Maker</span>
+            </div>
+        </a>
 
         <h1 class="mt-4 mb-2 main-coin-text">{{token.symbol}}</h1>
         <h4 class="mb-5 lead text-muted">{{token.name}}</h4>
@@ -130,28 +132,12 @@ export default {
     }
 }
 </script>
-
-<style>
-.cover-container {
-    max-width: 42em !important;
+<style scoped>
+.link-no-style,
+.link-no-style:hover,
+.link-no-style:active,
+.link-no-style::before {
+    color: black;
+    text-decoration-line: none;
 }
-.eth-logo {
-    background-image: url("/img/ethereum-ci.png");
-    background-size: 100px;
-    background-repeat: no-repeat;
-    background-position: center;
-    width: 100%;
-    height: 120px;
-}
-.service-name {
-    font-size: 1.2em;
-    font-weight: bold;
-}
-.main-coin-text {
-    font-size: 60px;
-}
-.mastfoot {
-    bottom: 1em;
-}
-
 </style>
