@@ -2,8 +2,9 @@ import Vue from 'vue'
 import Router from 'vue-router'
 
 import TokenDetail from './views/TokenDetail'
-import CreatedToken from './views/CreatedToken'
-
+import CreateFormToken from './views/CreateFormToken'
+import CreateTokenConfirm from './views/CreateTokenConfirm'
+import CreateToken from './views/CreateToken'
 
 Vue.use(Router)
 
@@ -13,7 +14,24 @@ export default new Router({
         {
             path: "/tokens",
             name: "CreatedToken",
-            component: CreatedToken
+            component: CreateFormToken,
+            props: false
+        },
+        {
+            path: "/confirm",
+            name: "CreateTokenConfirm",
+            component: CreateTokenConfirm,
+            props: {
+                token: true
+            }
+        },
+        {
+            path: "/create",
+            name: "CreateToken",
+            component: CreateToken,
+            props: {
+                token: true
+            }
         },
         {
             path: "/tokens/:token",

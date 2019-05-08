@@ -1,5 +1,3 @@
-const etherscanAPIKey = 'FRJQ1669KTFICCKM4I1QDCI26QKN2TSKM9'
-
 class Utils {
     constructor() {
         this.network = location.host.substring(0, location.host.indexOf('.')) || 'ropsten'
@@ -21,7 +19,7 @@ class Utils {
         return await res.json()
     }
     comma(num) {
-        return num.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ',');
+        return String(num).replace(/\B(?=(\d{3})+(?!\d))/g, ',');
     }
     link(type, hash) {
         return `https://${this.network}.etherscan.io/${type}/${hash}`
