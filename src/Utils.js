@@ -1,3 +1,5 @@
+import Web3 from 'web3'
+
 class Utils {
     constructor() {
         this.network = location.host.substring(0, location.host.indexOf('.')) || 'ropsten'
@@ -37,6 +39,10 @@ class Utils {
         return tmpDate.getFullYear() + '.' + 
         ((tmpDate.getMonth() + 1) <= 10 ? '0' + (tmpDate.getMonth() + 1) : tmpDate.getMonth() + 1) + '.' +
         (tmpDate.getDate() <= 10 ? '0' + tmpDate.getDate() : tmpDate.getDate())
+    }
+    getWeb3() {
+        // let web3 = new Web3(new Web3.providers.HttpProvider('http://localhost:7545'))
+        return new Web3(window.web3.currentProvider)
     }
 }
 

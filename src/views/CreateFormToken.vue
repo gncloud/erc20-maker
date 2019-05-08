@@ -115,7 +115,7 @@
                         ref="AdvancedOptions">
                     
                     <b-form-group
-                        label="가스가격 (gwei)"
+                        label="가스가격 (GWEI)"
                         label-for=""
                         class="mr-2"
                         description=""
@@ -163,23 +163,37 @@
 </template>
 <script>
 import Utils from '../Utils'
-import { isNumber } from 'util';
 
 export default {
     name: "CreatedToken",
     data() {
         return {
-            name: 'TESTCOIN',
-            symbol: 'TEST',
+            name: '',
+            symbol: '',
             decimals: 0,
             isAdditional: 'accepted',
-            totalSupply: 10,
-            initSupply: 5,
-            gasLimit: 21000,
+            totalSupply: 0,
+            initSupply: 1000000000,
+            gasLimit: 2100000,
             gasPrice: 10
         }
     },
+    created() {
+        this.checkNetwork()
+    },
     methods: {
+        async checkNetwork() {
+            const host = location.host
+            let network = host.substring(0, host.indexOf('.')).toLowerCase() || "ropsten"
+            let web3 = Utils.getWeb3()
+            let networkType = await web3.eth.net.getNetworkType()
+            this.$log.debug('page network: ', network, 'metamask network', networkType)
+            networkType = networkType == 'main' ? 'mainnet' : networkType
+            if (network != networkType) {
+                location.href = `https://${networkType}.gncloud.io/tokens`
+                // location.href = `http://${networkType}.gn.io:8080/tokens`
+            }
+        },
         toggleAdvancedOptions() {
             this.$refs.AdvancedOptions.classList.toggle('d-none')
         },
@@ -190,7 +204,8 @@ export default {
             this.$data.decimalsText = Utils.comma(this.$data.decimals)
             this.$data.totalSupplyText = Utils.comma(this.$data.totalSupply)
             this.$data.initSupplyText = Utils.comma(this.$data.initSupply)
-            this.$data.gasPriceText = Utils.comma(this.gasPrice * 10000000000)
+            this.$data.gasPrice = this.gasPrice * 1000000000
+            this.$data.gasPriceText = Utils.comma(this.gasPrice)
             this.$data.gasLimitText = Utils.comma(this.gasLimit)
             this.$router.push({
                 name: 'CreateTokenConfirm',
@@ -199,37 +214,38 @@ export default {
             return false
         },
         validation() {
-            if (this.name.length < 3 && 25 < this.name.length) {
+            if (this.name === '' || this.name.length < 3 && 25 < this.name.length) {
                 alert('이름의 길이가 안맞습니다.')
                 return false
             }
-            if (/[^a-zA-Z-\\s]+/.test(this.name)) {
-                alert('영문자로 작성해주세요. 공백, 하이픈도 가능합니다.')
-                return false
-            }
-            if (this.symbol.length < 3 && 10 < this.symbol.length) {
+            // if (!/[^a-zA-Z-\\s]+/.test(this.name)) {
+            //     alert('이름은 영문자로 작성해주세요. 공백, 하이픈도 가능합니다.')
+            //     return false
+            // }
+            if (this.symbol === '' || this.symbol.length < 3 && 10 < this.symbol.length) {
                 alert('심볼의 길이가 안맞습니다.')
                 return false
             }
             if (/[^a-zA-Z]+/.test(this.symbol)) {
-                alert('영문자로 작성해주세요.')
+                alert('심볼은 영문자로 작성해주세요.')
                 return false
             }
-            if (!isNumber(this.decimals) || this.decimals < 0) {
+            if (this.decimals < 0) {
                 alert('소수점수는 숫자로 입력해주세요.')
                 return false
             }
-            if (!isNumber(this.totalSupply) || this.totalSupply < 0) {
+            if (this.totalSupply < 0) {
                 alert('총발행량은 숫자로 입력해주세요.')
                 return false
             }
-            if (!isNumber(this.initSupply) || this.initSupply < 0) {
+            if (this.initSupply < 0) {
                 alert('초기발행량은 숫자로 입력해주세요.')
                 return false
             }
             return true
         },
         transfer() {
+            // this.token.networkType = await web3.eth.net.getNetworkType()
             // clonedContract.methods.transfer('0x430d4b747080A78F362D5F9E711215Ccd08e364a', 1)
                 //     .send({from: this.from, gas: this.gasLimit})
                 //     .on('transactionHash', (hash) => {

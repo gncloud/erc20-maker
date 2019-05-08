@@ -74,14 +74,13 @@
     </b-container>
 </template>
 <script>
-import Web3 from 'web3'
 import Utils from '../Utils'
-import { finished } from 'stream';
 
 export default {
     name: 'CreateTokenConfirm',
     data() {
         return {
+            eventCode: null,
             isMetaMaskReady: false,
             token: {
                 owner: null,
@@ -93,8 +92,10 @@ export default {
         if(Object.keys(this.$route.params).length === 0) {
             this.$router.push('/tokens')
         }
-        this.pollWeb3()
         this.setToken()
+    },
+    mounted() {
+        this.pollWeb3()
     },
     methods: {
         setToken() {
@@ -114,8 +115,7 @@ export default {
         },
         async pollWeb3() {
             try {
-                // let web3 = new Web3(new Web3.providers.HttpProvider('http://localhost:7545'))
-                let web3 = new Web3(window.web3.currentProvider)
+                let web3 = Utils.getWeb3()
                 this.token.owner = await web3.eth.getCoinbase()
                 this.token.networkType = await web3.eth.net.getNetworkType()
                 this.$refs.ownerLink.setAttribute('href', Utils.link('address', this.token.owner))
@@ -129,7 +129,7 @@ export default {
                 this.token.owner = ''
                 this.$log.error(e)
             } finally {
-                setTimeout(this.pollWeb3, 700)
+                this.eventCode = setTimeout(this.pollWeb3, 700)
             }
         },
         next() {
@@ -138,15 +138,18 @@ export default {
                 return false
             }
             this.$router.replace({
-                name: 'createToken',
+                name: 'CreateToken',
                 params: {
-                    ...this.$data
+                    ...this.token
                 }
             })
         }
     },
     destroyed() {
-        
+        if (this.eventCode != null) {
+            clearTimeout(this.eventCode)
+            this.eventCode = null
+        }
     }
 }
 </script>

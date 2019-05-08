@@ -18,7 +18,7 @@ export default new Router({
             props: false
         },
         {
-            path: "/confirm",
+            path: "/tokens/confirm",
             name: "CreateTokenConfirm",
             component: CreateTokenConfirm,
             props: {
@@ -26,7 +26,7 @@ export default new Router({
             }
         },
         {
-            path: "/create",
+            path: "/tokens/create",
             name: "CreateToken",
             component: CreateToken,
             props: {

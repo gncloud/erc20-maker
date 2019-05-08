@@ -27,6 +27,10 @@
                 <th>총 발행량</th>
                 <td>{{token.totalSupply}}</td>
             </tr>
+            <!-- <tr>
+                <th>초기 발행량</th>
+                <td>{{token.initSupply}}</td>
+            </tr> -->
             <tr>
                 <th>소수점갯수</th>
                 <td>{{token.decimals}}</td>
@@ -68,8 +72,7 @@
 </template>
 
 <script>
-import Web3 from 'web3'
-import sampleABI from '../contracts/sample-abi'
+import { abi } from '../templates/newTokenTemplate'
 import Utils from '../Utils'
 
 export default {
@@ -77,12 +80,12 @@ export default {
     components: {},
     data() {
         return {
-            web3: null,
             token: {
                 id: null,
                 idText: null,
                 name: null,
                 symbol: null,
+                initSupply: null,
                 totalSupply: null,
                 decimals: null,
                 owner: null,
@@ -95,14 +98,12 @@ export default {
     },
     created() {
         this.token.id = this.$route.params.token
-        this.web3 = new Web3(new Web3.providers.HttpProvider('http://localhost:7545'))
         this.getTokenSummary(this.getInstance())
-        // this.getTokenDate()
-        // this.deployTest()
     },
     methods: {
         getInstance() {
-            return new this.web3.eth.Contract(sampleABI, this.token.id)
+            let web3 = Utils.getWeb3()
+            return new web3.eth.Contract(abi, this.token.id)
         },
         async getTokenSummary(instance) {
             this.token.name        = await instance.methods.name().call()
