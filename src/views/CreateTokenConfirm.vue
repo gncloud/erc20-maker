@@ -2,15 +2,17 @@
     <b-container class="text-center cover-container" 
                  v-if="token.symbol !== undefined">
         
-        <a href="/tokens" class="link-no-style">
+        <a href="/tokens/new" class="link-no-style">
             <div class="eth-logo"></div>
             <div>
                 <span class="service-name">토큰 생성</span>
             </div>
         </a>
         <div class="text-center my-3 wallet-info">
-            <b-button v-if="metamaskError !== null" variant="danger" v-b-popover.hover="`${metamaskError}`" >계정</b-button>
-            <b-button v-if="metamaskError === null" variant="light" v-b-popover.hover="`사용자: ${token.ownerText} \n네트워크: ${token.networkType}`" >계정</b-button>
+            <b-button :variant="token.networkType === 'mainnet' ? 'outline-success' : 'outline-danger'" 
+                      v-b-popover.hover="`지갑주소: ${token.ownerText}`" >
+                {{networkTypeText}}
+            </b-button>
         </div>
 
         <div class="mt-5 text-left">아래 내용이 맞는지 검토하세요.</div>
@@ -38,10 +40,6 @@
                 <td>총 발행량</td>
                 <td>{{token.totalSupply}}</td>
             </tr>
-            <!-- <tr>
-                <td>초기 발행량</td>
-                <td>{{token.initSupply}}</td>
-            </tr> -->
             <tr>
                 <td>소유자 계정</td>
                 <td>
@@ -56,7 +54,7 @@
             </tr>
             <tr>
                 <td>가스 가격</td>
-                <td>{{token.gasPriceText}}</td>
+                <td>{{token.gasPriceText}} (GWEI)</td>
             </tr>
             <tr>
                 <td>가스 제한</td>
@@ -77,7 +75,7 @@
                 생성하기
             </b-button>
             
-            <b-link href="/tokens" class="text-danger ml-2">취소</b-link>
+            <b-link href="/tokens/new" class="text-danger ml-2">취소</b-link>
         </div>
         <div class="mastfoot mt-5">
             <div class="inner">
@@ -97,7 +95,7 @@ export default {
         return {
             eventCode: null,
             isMetaMaskReady: false,
-            metamaskError: null,
+            networkTypeText: null,
             token: {
                 owner: null,
                 networkType: null
@@ -106,7 +104,7 @@ export default {
     },
     created() {
         if(Object.keys(this.$route.params).length === 0) {
-            this.$router.push('/tokens')
+            this.$router.push('/tokens/new')
         }
         this.setToken()
     },
@@ -120,12 +118,10 @@ export default {
             this.token.decimals = this.$route.params.decimals
             this.token.isAdditional = this.$route.params.isAdditional
             this.token.totalSupply = this.$route.params.totalSupply
-            // this.token.initSupply = this.$route.params.initSupply
             this.token.gasLimit = this.$route.params.gasLimit
             this.token.gasPrice = this.$route.params.gasPrice
 
             this.token.totalSupplyText = this.$route.params.totalSupplyText
-            // this.token.initSupplyText = this.$route.params.initSupplyText
             this.token.gasLimitText = this.$route.params.gasLimitText
             this.token.gasPriceText = this.$route.params.gasPriceText
         },
@@ -136,13 +132,23 @@ export default {
                 this.token.networkType = await web3.eth.net.getNetworkType()
                 this.$refs.ownerLink.setAttribute('href', Utils.link('address', this.token.owner))
                 this.token.ownerText = Utils.shortHash(this.token.owner)
-                this.isMetaMaskReady = true
-                this.metamaskError = null
+                
+                this.token.networkType = this.token.networkType == 'main' ? 'mainnet' : this.token.networkType
+                if (this.token.networkType === null || this.token.networkType === '') {
+                    this.networkTypeText = '연결안됨'
+                } else {
+                    this.networkTypeText = Utils.capitalizeFirstLetter(this.token.networkType)
+                }
+                
+                if (this.token.ownerText !== '') {
+                    this.isMetaMaskReady = true
+                } else {
+                    this.token.ownerText = '연결안됨'
+                }
             } catch(e) {
                 this.isMetaMaskReady = false
-                this.metamaskError = '계정과 연결이 되지 않았습니다.'
-                this.token.networkType = ''
-                this.token.ownerText = ''
+                this.networkTypeText = '연결안됨'
+                this.token.ownerText = '연결안됨'
                 this.$refs.ownerLink = ''
                 this.token.owner = ''
                 this.$log.error(e)

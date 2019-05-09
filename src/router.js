@@ -12,7 +12,7 @@ export default new Router({
     mode: 'history',
     routes: [
         {
-            path: "/tokens",
+            path: "/tokens/new",
             name: "CreatedToken",
             component: CreateFormToken,
             props: false

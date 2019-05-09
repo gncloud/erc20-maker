@@ -6,8 +6,10 @@
             <span class="service-name">토큰 생성</span>
         </div>
         <div class="text-center my-3 wallet-info">
-            <b-button v-if="metamaskError !== null" variant="danger" v-b-popover.hover="`${metamaskError}`" >계정</b-button>
-            <b-button v-if="metamaskError === null" variant="light" v-b-popover.hover="`사용자: ${owner} \n네트워크: ${networkType}`" >계정</b-button>
+            <b-button :variant="networkType === 'mainnet' ? 'outline-success' : 'outline-danger'" 
+                      v-b-popover.hover="`지갑주소: ${owner}`" >
+                {{networkTypeText}}
+            </b-button>
         </div>
         
         <b-form @submit="next">
@@ -15,7 +17,7 @@
                 <b-form-group
                     label="토큰 이름"
                     label-for="name"
-                    description=""
+                    description="3-25 자리로 영문자로 작성. 공백, 하이픈도 가능."
                 >
                     <b-form-input
                         ref="name"
@@ -31,14 +33,14 @@
                         aria-describedby="name-live-feedback"
                     ></b-form-input>
                     <b-form-invalid-feedback id="name-live-feedback">
-                        3-25 자리로 영문자로 작성. 공백, 하이픈도 가능.
+                        형식에 맞게 입력해주세요.
                     </b-form-invalid-feedback>
                 </b-form-group>
 
                 <b-form-group
                     label="토큰 심볼"
                     label-for="symbol"
-                    description=""
+                    description="3-4글자 영문자. 공백허용안됨."
                 >
                     <b-form-input
                         ref="symbol"
@@ -54,14 +56,14 @@
                         aria-describedby="symbol-live-feedback"
                     ></b-form-input>
                     <b-form-invalid-feedback class="show" id="symbol-live-feedback">
-                        3-4글자 영문자. 공백허용안됨.
+                        형식에 맞게 입력해주세요.
                     </b-form-invalid-feedback>
                 </b-form-group>
 
                 <b-form-group
                     label="소수점수"
                     label-for="decimals"
-                    description=""
+                    description="토큰을 더 쪼갤수 있는 소수점 자릿수를 나타내며, 0-18 사이의 정수 허용."
                 >
                     <b-form-input
                         ref="decimals"
@@ -75,14 +77,14 @@
                         aria-describedby="decimals-live-feedback"
                     ></b-form-input>
                     <b-form-invalid-feedback id="decimals-live-feedback">
-                        토큰을 더 쪼갤수 있는 소수점 자릿수를 나타내며, 0-18 사이의 정수 허용.
+                        형식에 맞게 입력해주세요.
                     </b-form-invalid-feedback>
                 </b-form-group>
 
                 <b-form-group
                     label="총발행량"
                     label-for="totalSupply"
-                    description=""
+                    description="생성할 토큰의 총 갯수. 최소1에서 최대 1000000000000000 가능."
                 >
                     <b-form-input
                         ref="totalSupply"
@@ -96,7 +98,7 @@
                         aria-describedby="totalSupply-live-feedback"
                     ></b-form-input>
                     <b-form-invalid-feedback id="totalSupply-live-feedback">
-                        생성할 토큰의 총 갯수. 최소1에서 최대 1000000000000000 가능.
+                        형식에 맞게 입력해주세요.
                     </b-form-invalid-feedback>
                 </b-form-group>
 
@@ -148,7 +150,7 @@
                                 aria-describedby="gasPrice-live-feedback"
                             ></b-form-input>
                             <b-form-invalid-feedback id="gasPrice-live-feedback">
-                                
+                                형식에 맞게 입력해주세요.
                             </b-form-invalid-feedback>
                         </b-form-group>
 
@@ -170,7 +172,7 @@
                                 aria-describedby="gasLimit-live-feedback"
                             ></b-form-input>
                             <b-form-invalid-feedback id="gasLimit-live-feedback">
-                                
+                                형식에 맞게 입력해주세요.
                             </b-form-invalid-feedback>
                         </b-form-group>
 
@@ -210,7 +212,8 @@ export default {
             gasPrice: 10,
             networkType: null,
             owner: null,
-            metamaskError: null
+            metamaskError: null,
+            networkTypeText: null
         }
     },
     created() {
@@ -242,13 +245,16 @@ export default {
                 this.owner = Utils.shortHash(await web3.eth.getCoinbase())
                 this.networkType = this.networkType == 'main' ? 'mainnet' : this.networkType
                 if (network != this.networkType) {
-                    location.href = `https://${this.networkType}.gncloud.io/tokens`
+                    location.href = `https://${this.networkType}.gncloud.io/tokens/new`
                 }
-                this.metamaskError = null
+                this.networkTypeText = Utils.capitalizeFirstLetter(this.networkType)
+                if (this.owner == '') {
+                    this.owner = '연결안됨'
+                }
             } catch(e) {
-                this.networkType = ''
-                this.owner = ''
-                this.metamaskError = '계정과 연결이 되지 않았습니다.'
+                this.$log.debug(e)
+                this.owner = '연결안됨'
+                this.networkTypeText = '연결안됨'
             } finally {
                 setTimeout(this.checkNetwork, 1000)
             }
@@ -261,8 +267,8 @@ export default {
             this.$data.decimalsText = Utils.comma(this.$data.decimals)
             this.$data.totalSupplyText = Utils.comma(this.$data.totalSupply)
             // this.$data.initSupplyText = Utils.comma(this.$data.initSupply)
-            this.$data.gasPrice = this.gasPrice * 1000000000
             this.$data.gasPriceText = Utils.comma(this.gasPrice)
+            this.$data.gasPrice = this.gasPrice * 1000000000
             this.$data.gasLimitText = Utils.comma(this.gasLimit)
             this.$router.push({
                 name: 'CreateTokenConfirm',

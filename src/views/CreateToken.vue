@@ -39,7 +39,7 @@ export default {
     created() {
         this.token = this.$route.params
         if (Object.keys(this.token).length == 0) {
-            this.$router.replace('/tokens')
+            this.$router.replace('/tokens/new')
             return false
         }
         this.$log.debug('params ', this.token)
@@ -51,13 +51,19 @@ export default {
             
             // TODO 분리 작업.
             // isAdditional >>> "accepted" 
-            let jsonPath = '../templates/MintableTokenTemplate.json'
+            let abi = null
+            let bytecode = null
             if (this.token.isAdditional === 'not_accepted') {
-                jsonPath = '../templates/CappedTokenTemplate.json'
+                const template = require('../templates/CappedTokenTemplate.json')
+                abi = template.abi
+                bytecode = template.bytecode
+            } else {
+                const template = require('../templates/MintableTokenTemplate.json')
+                abi = template.abi
+                bytecode = template.bytecode
             }
-            const { abi, bytecode } = require(jsonPath)
-            const newContract = new web3.eth.Contract(abi, '', { data: bytecode })
             
+            const newContract = new web3.eth.Contract(abi, '', { data: bytecode })
             newContract.transactionConfirmationBlocks = 1
             this.$log.debug('소유자', this.token.owner)
             this.$log.debug('가스제한', this.token.gasLimit)

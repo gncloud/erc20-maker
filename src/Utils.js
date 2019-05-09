@@ -24,9 +24,16 @@ class Utils {
         return String(num).replace(/\B(?=(\d{3})+(?!\d))/g, ',');
     }
     link(type, hash) {
-        return `https://${this.network}.etherscan.io/${type}/${hash}`
+        if (hash === undefined || hash === null || hash === '') {
+            return '#'
+        } else {
+            return `https://${this.network}.etherscan.io/${type}/${hash}`
+        }
     }
     shortHash(hash) {
+        if (hash === undefined || hash == null) {
+            return ''
+        }
         if (hash.length > 8) {
             return hash.substring(0, 5) + "..." + hash.substring(hash.length - 5, hash.length)
         } else {
@@ -43,6 +50,9 @@ class Utils {
     getWeb3() {
         // let web3 = new Web3(new Web3.providers.HttpProvider('http://localhost:7545'))
         return new Web3(window.web3.currentProvider)
+    }
+    capitalizeFirstLetter(string) {
+        return string.charAt(0).toUpperCase() + string.slice(1)
     }
 }
 

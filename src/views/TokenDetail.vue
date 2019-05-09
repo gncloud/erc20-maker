@@ -1,15 +1,17 @@
 <template>
     <b-container class="text-center cover-container">
         
-        <a href="/tokens" class="link-no-style">
+        <a href="/tokens/new" class="link-no-style">
             <div class="eth-logo"></div>
             <div>
                 <span class="service-name">ERC-20 Token Maker</span>
             </div>
         </a>
         <div class="text-center my-3 wallet-info">
-            <b-button v-if="metamaskError !== null" variant="danger" v-b-popover.hover="`${metamaskError}`" >계정</b-button>
-            <b-button v-if="metamaskError === null" variant="light" v-b-popover.hover="`사용자: ${token.ownerText} \n네트워크: ${token.networkType}`" >계정</b-button>
+            <b-button :variant="token.networkType === 'mainnet' ? 'outline-success' : 'outline-danger'" 
+                      v-b-popover.hover="`지갑주소: ${coinbaseText}`" >
+                {{networkTypeText}}
+            </b-button>
         </div>
 
         <h1 class="mt-4 mb-2 main-coin-text">{{token.symbol}}</h1>
@@ -87,7 +89,9 @@ export default {
     data() {
         return {
             web3: null,
-            metamaskError: null,
+            networkTypeText: null,
+            coinbase: null,
+            coinbaseText: null,
             token: {
                 id: null,
                 idText: null,
@@ -107,6 +111,7 @@ export default {
     created() {
         this.token.id = this.$route.params.token
         this.getTokenSummary(this.getInstance())
+        this.getWallet()
     },
     methods: {
         getInstance() {
@@ -115,12 +120,11 @@ export default {
                 this.web3 = Utils.getWeb3()
                 instance = new this.web3.eth.Contract(abi, this.token.id)
             } catch (e) {
-                this.metamaskError = '계정과 연결이 되지 않았습니다.'
+                this.networkTypeText = '연결안됨'
             }
             return instance
         },
         async getTokenSummary(instance) {
-            this.token.networkType = await this.web3.eth.net.getNetworkType()
             this.token.name        = await instance.methods.name().call()
             this.token.symbol      = await instance.methods.symbol().call()
             this.token.owner       = await instance.methods.owner().call()
@@ -140,6 +144,27 @@ export default {
                 this.token.date = Utils.timeStampToDate(Number(this.token.timeStamp) * 1000)
             } catch(e) {
                 this.token.date = Utils.timeStampToDate(new Date().getTime())
+            }
+        },
+        async getWallet() {
+            try {
+                this.token.networkType = await this.web3.eth.net.getNetworkType()
+                this.coinbase = Utils.shortHash(await this.web3.eth.getCoinbase())
+                this.coinbaseText = Utils.shortHash(this.coinbase)
+                if(this.coinbaseText === '') {
+                    this.coinbaseText = '연결안됨'
+                }
+                this.token.networkType = this.token.networkType == 'main' ? 'mainnet' : this.token.networkType
+                if (this.token.networkType === null || this.token.networkType === '') {
+                    this.networkTypeText = '연결안됨'
+                } else {
+                    this.networkTypeText = Utils.capitalizeFirstLetter(this.token.networkType)
+                }
+            } catch(e) {
+                this.coinbaseText = '연결안됨'
+                this.$log.debug(e)
+            } finally {
+                setTimeout(this.getWallet, 1000)
             }
         }
     }
