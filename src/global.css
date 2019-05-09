@@ -20,3 +20,7 @@
 .mastfoot {
     bottom: 1em;
 }
+.wallet-info {
+    position: absolute;
+    top: 20px;
+}

@@ -8,6 +8,10 @@
                 <span class="service-name">토큰 생성</span>
             </div>
         </a>
+        <div class="text-center my-3 wallet-info">
+            <b-button v-if="metamaskError !== null" variant="danger" v-b-popover.hover="`${metamaskError}`" >계정</b-button>
+            <b-button v-if="metamaskError === null" variant="light" v-b-popover.hover="`사용자: ${token.ownerText} \n네트워크: ${token.networkType}`" >계정</b-button>
+        </div>
 
         <div class="mt-5 text-left">아래 내용이 맞는지 검토하세요.</div>
         <table class="table text-left">
@@ -34,10 +38,10 @@
                 <td>총 발행량</td>
                 <td>{{token.totalSupply}}</td>
             </tr>
-            <tr>
+            <!-- <tr>
                 <td>초기 발행량</td>
                 <td>{{token.initSupply}}</td>
-            </tr>
+            </tr> -->
             <tr>
                 <td>소유자 계정</td>
                 <td>
@@ -60,10 +64,19 @@
             </tr>
         </table>
         <div class="text-center mt-4">
-            <b-button  
-            :variant="isMetaMaskReady ? 'primary' : 'secondary'"
+            <b-button
+            variant="outline-primary"
+            @click="back()"
+            class="mr-2">
+             뒤로
+            </b-button>
 
-            class="mr-2" @click="next()">생성하기</b-button>
+            <b-button  
+                :variant="isMetaMaskReady ? 'primary' : 'secondary'"
+                class="mr-2" @click="next()">
+                생성하기
+            </b-button>
+            
             <b-link href="/tokens" class="text-danger ml-2">취소</b-link>
         </div>
         <div class="mastfoot mt-5">
@@ -84,6 +97,7 @@ export default {
         return {
             eventCode: null,
             isMetaMaskReady: false,
+            metamaskError: null,
             token: {
                 owner: null,
                 networkType: null
@@ -106,12 +120,12 @@ export default {
             this.token.decimals = this.$route.params.decimals
             this.token.isAdditional = this.$route.params.isAdditional
             this.token.totalSupply = this.$route.params.totalSupply
-            this.token.initSupply = this.$route.params.initSupply
+            // this.token.initSupply = this.$route.params.initSupply
             this.token.gasLimit = this.$route.params.gasLimit
             this.token.gasPrice = this.$route.params.gasPrice
 
             this.token.totalSupplyText = this.$route.params.totalSupplyText
-            this.token.initSupplyText = this.$route.params.initSupplyText
+            // this.token.initSupplyText = this.$route.params.initSupplyText
             this.token.gasLimitText = this.$route.params.gasLimitText
             this.token.gasPriceText = this.$route.params.gasPriceText
         },
@@ -123,20 +137,22 @@ export default {
                 this.$refs.ownerLink.setAttribute('href', Utils.link('address', this.token.owner))
                 this.token.ownerText = Utils.shortHash(this.token.owner)
                 this.isMetaMaskReady = true
+                this.metamaskError = null
             } catch(e) {
                 this.isMetaMaskReady = false
+                this.metamaskError = '계정과 연결이 되지 않았습니다.'
                 this.token.networkType = ''
                 this.token.ownerText = ''
                 this.$refs.ownerLink = ''
                 this.token.owner = ''
                 this.$log.error(e)
             } finally {
-                this.eventCode = setTimeout(this.pollWeb3, 700)
+                this.eventCode = setTimeout(this.pollWeb3, 1000)
             }
         },
         next() {
             if (!this.isMetaMaskReady) {
-                alert('메타마스크와 연결이 안되었습니다.')
+                alert('계정과 연결이 되지 않았습니다.')
                 return false
             }
             this.$router.replace({
@@ -144,6 +160,12 @@ export default {
                 params: {
                     ...this.token
                 }
+            })
+        },
+        back() {
+            this.$router.replace({
+                name: 'CreatedToken',
+                params: this.token
             })
         }
     },

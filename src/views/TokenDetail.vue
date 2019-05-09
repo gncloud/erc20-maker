@@ -7,6 +7,10 @@
                 <span class="service-name">ERC-20 Token Maker</span>
             </div>
         </a>
+        <div class="text-center my-3 wallet-info">
+            <b-button v-if="metamaskError !== null" variant="danger" v-b-popover.hover="`${metamaskError}`" >계정</b-button>
+            <b-button v-if="metamaskError === null" variant="light" v-b-popover.hover="`사용자: ${token.ownerText} \n네트워크: ${token.networkType}`" >계정</b-button>
+        </div>
 
         <h1 class="mt-4 mb-2 main-coin-text">{{token.symbol}}</h1>
         <h4 class="mb-5 lead text-muted">{{token.name}}</h4>
@@ -74,7 +78,7 @@
 </template>
 
 <script>
-import { abi } from '../templates/newTokenTemplate'
+import { abi } from '../templates/MintableTokenTemplate'
 import Utils from '../Utils'
 
 export default {
@@ -82,6 +86,8 @@ export default {
     components: {},
     data() {
         return {
+            web3: null,
+            metamaskError: null,
             token: {
                 id: null,
                 idText: null,
@@ -104,10 +110,17 @@ export default {
     },
     methods: {
         getInstance() {
-            let web3 = Utils.getWeb3()
-            return new web3.eth.Contract(abi, this.token.id)
+            let instance = null
+            try {
+                this.web3 = Utils.getWeb3()
+                instance = new this.web3.eth.Contract(abi, this.token.id)
+            } catch (e) {
+                this.metamaskError = '계정과 연결이 되지 않았습니다.'
+            }
+            return instance
         },
         async getTokenSummary(instance) {
+            this.token.networkType = await this.web3.eth.net.getNetworkType()
             this.token.name        = await instance.methods.name().call()
             this.token.symbol      = await instance.methods.symbol().call()
             this.token.owner       = await instance.methods.owner().call()

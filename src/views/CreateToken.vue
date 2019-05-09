@@ -51,7 +51,11 @@ export default {
             
             // TODO 분리 작업.
             // isAdditional >>> "accepted" 
-            const { abi, bytecode } = require('../templates/newTokenTemplate')
+            let jsonPath = '../templates/MintableTokenTemplate.json'
+            if (this.token.isAdditional === 'not_accepted') {
+                jsonPath = '../templates/CappedTokenTemplate.json'
+            }
+            const { abi, bytecode } = require(jsonPath)
             const newContract = new web3.eth.Contract(abi, '', { data: bytecode })
             
             newContract.transactionConfirmationBlocks = 1
@@ -60,7 +64,7 @@ export default {
             this.$log.debug('가스가격', this.token.gasPrice)
             newContract.deploy({
                 data: bytecode,
-                arguments: [this.token.name, this.token.symbol, this.token.decimals, this.token.initSupply]
+                arguments: [this.token.name, this.token.symbol, this.token.decimals, (this.token.totalSupply * (10 ** this.token.decimals))]
             })
             .send({
                     from: this.token.owner, 
