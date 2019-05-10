@@ -44,8 +44,8 @@ class Utils {
         let tmpDate = new Date()
         tmpDate.setTime(Number(timeStamp))
         return tmpDate.getFullYear() + '.' + 
-        ((tmpDate.getMonth() + 1) <= 10 ? '0' + (tmpDate.getMonth() + 1) : tmpDate.getMonth() + 1) + '.' +
-        (tmpDate.getDate() <= 10 ? '0' + tmpDate.getDate() : tmpDate.getDate())
+        ((tmpDate.getMonth() + 1) < 10 ? '0' + (tmpDate.getMonth() + 1) : tmpDate.getMonth() + 1) + '.' +
+        (tmpDate.getDate() < 10 ? '0' + tmpDate.getDate() : tmpDate.getDate())
     }
     getWeb3() {
         // let web3 = new Web3(new Web3.providers.HttpProvider('http://localhost:7545'))

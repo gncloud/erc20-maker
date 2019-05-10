@@ -93,7 +93,7 @@
                         placeholder=""
                         v-model="totalSupply"
                         name="totalSupply"
-                        v-validate="{ required: true, numeric: true, min: 3, max: 25}"
+                        v-validate="{ required: true, numeric: true, min_value: 1, max_value: 1000000000000000}"
                         :state="validateState('totalSupply')"
                         aria-describedby="totalSupply-live-feedback"
                     ></b-form-input>
@@ -205,7 +205,7 @@ export default {
         return {
             name: '',
             symbol: '',
-            decimals: 0,
+            decimals: 18,
             isAdditional: 'accepted',
             totalSupply: null,
             gasLimit: 2100000,

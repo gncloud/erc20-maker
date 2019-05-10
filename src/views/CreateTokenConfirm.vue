@@ -85,15 +85,29 @@
                 </p>
             </div>
         </div>
+        <loading :active.sync="isLoading" 
+                :can-cancel="false" 
+                :is-full-page="true"
+                :height="180"
+                :width="180"
+                background-color="#000"
+                color="yellow"
+                loader="dots"
+                >
+        </loading>
     </b-container>
 </template>
 <script>
 import Utils from '../Utils'
+import Loading from 'vue-loading-overlay';
+import 'vue-loading-overlay/dist/vue-loading.css';
 
 export default {
     name: 'CreateTokenConfirm',
     data() {
         return {
+            web3: null,
+            isLoading: false,
             eventCode: null,
             isMetaMaskReady: false,
             networkTypeText: null,
@@ -102,6 +116,9 @@ export default {
                 networkType: null
             }
         }
+    },
+    components: {
+        Loading
     },
     created() {
         if(Object.keys(this.$route.params).length === 0) {
@@ -128,10 +145,12 @@ export default {
         },
         async pollWeb3() {
             try {
-                let web3 = Utils.getWeb3()
-                this.token.owner = await web3.eth.getCoinbase()
-                this.token.networkType = await web3.eth.net.getNetworkType()
-                this.$refs.ownerLink.setAttribute('href', Utils.link('address', this.token.owner))
+                this.web3 = Utils.getWeb3()
+                this.token.owner = await this.web3.eth.getCoinbase()
+                this.token.networkType = await this.web3.eth.net.getNetworkType()
+                if (this.$refs.ownerLink) {
+                    this.$refs.ownerLink.setAttribute('href', Utils.link('address', this.token.owner))
+                }
                 this.token.ownerText = Utils.shortHash(this.token.owner)
                 
                 this.token.networkType = this.token.networkType == 'main' ? 'mainnet' : this.token.networkType
@@ -162,12 +181,13 @@ export default {
                 alert('계정과 연결이 되지 않았습니다.')
                 return false
             }
-            this.$router.replace({
-                name: 'CreateToken',
-                params: {
-                    ...this.token
-                }
-            })
+            // this.$router.replace({
+            //     name: 'CreateToken',
+            //     params: {
+            //         ...this.token
+            //     }
+            // })
+            this.create()
         },
         back() {
             this.$router.replace({
@@ -177,6 +197,62 @@ export default {
         },
         goForm() {
             location.href="/tokens/new"
+        },
+        async create() {
+            let abi = null
+            let bytecode = null
+            if (this.token.isAdditional === 'not_accepted') {
+                const template = require('../templates/CappedTokenTemplate.json')
+                abi = template.abi
+                bytecode = template.bytecode
+            } else {
+                const template = require('../templates/MintableTokenTemplate.json')
+                abi = template.abi
+                bytecode = template.bytecode
+            }
+            
+            const newContract = new this.web3.eth.Contract(abi, '', { data: bytecode })
+            newContract.transactionConfirmationBlocks = 1
+            this.$log.debug('소유자', this.token.owner)
+            this.$log.debug('가스제한', this.token.gasLimit)
+            this.$log.debug('가스가격', this.token.gasPrice)
+            this.$log.debug('token info', this.token)
+            await newContract.deploy({
+                data: bytecode,
+                arguments: [
+                    this.token.name, 
+                    this.token.symbol, 
+                    this.token.decimals, 
+                    (Number(this.token.totalSupply) * (10 ** this.token.decimals))
+                ]
+            })
+            .send({
+                    from: this.token.owner, 
+                    gas: this.token.gasLimit,
+                    gasPrice: this.token.gasPrice})
+            .on('error', (error) => { 
+                this.isLoading = false
+                this.$log.debug('error >>', error)
+             })
+            .on('transactionHash', (transactionHash) => { 
+                // start
+                this.isLoading = true
+                this.$log.debug('transactionHash >>', transactionHash)
+             })
+            .on('receipt', (receipt) => {
+                this.$log.debug('receipt >>', receipt)
+            })
+            .on('confirmation', (confirmationNumber, receipt) => { 
+                this.$log.debug('confirmation >>', confirmationNumber, receipt)
+             })
+            .then((newContractInstance) => {
+                // end
+                this.isLoading = false
+                this.$log.debug('then >>', newContractInstance)
+                let contractAddress = newContractInstance.options.address
+                this.$log.debug('contract address >> ', contractAddress)
+                this.$router.replace(`/tokens/${contractAddress}`)
+            });
         }
     },
     destroyed() {

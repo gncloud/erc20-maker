@@ -49,8 +49,6 @@ export default {
         async create() {
             let web3 = Utils.getWeb3()
             
-            // TODO 분리 작업.
-            // isAdditional >>> "accepted" 
             let abi = null
             let bytecode = null
             if (this.token.isAdditional === 'not_accepted') {
@@ -68,7 +66,7 @@ export default {
             this.$log.debug('소유자', this.token.owner)
             this.$log.debug('가스제한', this.token.gasLimit)
             this.$log.debug('가스가격', this.token.gasPrice)
-            newContract.deploy({
+            await newContract.deploy({
                 data: bytecode,
                 arguments: [this.token.name, this.token.symbol, this.token.decimals, (this.token.totalSupply * (10 ** this.token.decimals))]
             })
@@ -76,19 +74,37 @@ export default {
                     from: this.token.owner, 
                     gas: this.token.gasLimit,
                     gasPrice: this.token.gasPrice})
-            .then((clonedContract) => {
-                let contractAddress = clonedContract.options.address
-                this.$log.debug('clonedContract', clonedContract)
-                this.$log.debug('contract address >> ', contractAddress)
-                setTimeout(() => {
-                    this.$router.replace(`/tokens/${contractAddress}`)
-                }, 5000)
-            }, (e) => {
-                this.$log.debug(e)
-                alert("생성 실패.")
-                this.$refs.message.innerHTML = e.message
-                this.isLoading = false
+            .on('error', (error) => { 
+                this.$log.debug('error >>', error)
+             })
+            .on('transactionHash', (transactionHash) => { 
+                // start
+                this.$log.debug('transactionHash >>', transactionHash)
+             })
+            .on('receipt', (receipt) => {
+                this.$log.debug('receipt >>', receipt)
             })
+            .on('confirmation', (confirmationNumber, receipt) => { 
+                this.$log.debug('confirmation >>', confirmationNumber, receipt)
+             })
+            .then((newContractInstance) => {
+                // end
+                this.$log.debug('then >>', newContractInstance)
+            });
+            
+            // then((clonedContract) => {
+            //     let contractAddress = clonedContract.options.address
+            //     this.$log.debug('clonedContract', clonedContract)
+            //     this.$log.debug('contract address >> ', contractAddress)
+            //     setTimeout(() => {
+            //         this.$router.replace(`/tokens/${contractAddress}`)
+            //     }, 5000)
+            // }, (e) => {
+            //     this.$log.debug(e)
+            //     alert("생성 실패.")
+            //     this.$refs.message.innerHTML = e.message
+            //     this.isLoading = false
+            // })
         }
     }
 }
