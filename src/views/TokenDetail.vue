@@ -1,12 +1,19 @@
 <template>
     <b-container class="text-center cover-container">
         
-        <a href="/tokens/new" class="link-no-style">
+        <div class="text-center">
+            <div class="eth-logo cursor-pointer logo-width m-auto" @click="this.goForm"></div>
+            <div>
+                <span class="service-name cursor-pointer"
+                      @click="this.goForm">ERC-20 Token Maker</span>
+            </div>
+        </div>
+        <!-- <a href="/tokens/new" class="link-no-style">
             <div class="eth-logo"></div>
             <div>
                 <span class="service-name">ERC-20 Token Maker</span>
             </div>
-        </a>
+        </a> -->
         <div class="text-center my-3 wallet-info">
             <b-button :variant="token.networkType === 'mainnet' ? 'outline-success' : 'outline-danger'" 
                       v-b-popover.hover="`지갑주소: ${coinbaseText}`" >
@@ -166,6 +173,9 @@ export default {
             } finally {
                 setTimeout(this.getWallet, 1000)
             }
+        },
+        goForm() {
+            location.href="/tokens/new"
         }
     }
 }

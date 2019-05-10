@@ -24,3 +24,12 @@
     position: absolute;
     top: 20px;
 }
+.cursor-pointer {
+    cursor: pointer;
+}
+.logo-width {
+    width: 100px;
+}
+.m-auto {
+    margin: auto;
+}

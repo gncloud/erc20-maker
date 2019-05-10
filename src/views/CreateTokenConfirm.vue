@@ -1,13 +1,14 @@
 <template>
     <b-container class="text-center cover-container" 
                  v-if="token.symbol !== undefined">
-        
-        <a href="/tokens/new" class="link-no-style">
-            <div class="eth-logo"></div>
+        <div class="text-center">
+            <div class="eth-logo cursor-pointer logo-width m-auto" @click="this.goForm"></div>
             <div>
-                <span class="service-name">토큰 생성</span>
+                <span class="service-name cursor-pointer"
+                      @click="this.goForm">토큰 생성</span>
             </div>
-        </a>
+        </div>
+        
         <div class="text-center my-3 wallet-info">
             <b-button :variant="token.networkType === 'mainnet' ? 'outline-success' : 'outline-danger'" 
                       v-b-popover.hover="`지갑주소: ${token.ownerText}`" >
@@ -173,6 +174,9 @@ export default {
                 name: 'CreatedToken',
                 params: this.token
             })
+        },
+        goForm() {
+            location.href="/tokens/new"
         }
     },
     destroyed() {
