@@ -4,7 +4,7 @@ import Router from 'vue-router'
 import TokenDetail from './views/TokenDetail'
 import CreateFormToken from './views/CreateFormToken'
 import CreateTokenConfirm from './views/CreateTokenConfirm'
-import CreateToken from './views/CreateToken'
+// import CreateToken from './views/CreateToken'
 import TokenList from './views/TokenList'
 
 Vue.use(Router)

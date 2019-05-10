@@ -1,5 +1,12 @@
 import Web3 from 'web3'
 
+let web3 = new Web3(window.web3.currentProvider)
+// const pollWeb3 = () => {
+//     web3 = new Web3(window.web3.currentProvider)
+//     setTimeout(pollWeb3, 700)
+// }
+// pollWeb3()
+
 class Utils {
     constructor() {
         this.network = location.host.substring(0, location.host.indexOf('.')) || 'ropsten'
@@ -49,7 +56,8 @@ class Utils {
     }
     getWeb3() {
         // let web3 = new Web3(new Web3.providers.HttpProvider('http://localhost:7545'))
-        return new Web3(window.web3.currentProvider)
+        // return new Web3(window.web3.currentProvider)
+        return web3
     }
     capitalizeFirstLetter(string) {
         return string.charAt(0).toUpperCase() + string.slice(1)

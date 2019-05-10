@@ -101,6 +101,7 @@
 import Utils from '../Utils'
 import Loading from 'vue-loading-overlay';
 import 'vue-loading-overlay/dist/vue-loading.css';
+import Firestore from '../Firestore'
 
 export default {
     name: 'CreateTokenConfirm',
@@ -251,8 +252,35 @@ export default {
                 this.$log.debug('then >>', newContractInstance)
                 let contractAddress = newContractInstance.options.address
                 this.$log.debug('contract address >> ', contractAddress)
+                this.writeTokenInfo(contractAddress)
                 this.$router.replace(`/tokens/${contractAddress}`)
             });
+        },
+        writeTokenInfo(contractAddress) {
+            // {
+            //     name: "AdaAda2",
+            //     symbol: "Ada2",
+            //     decimals: 18,
+            //     totalSupply: 1000000,
+            //     network: "ropsten",
+            //     owner: "0x23456789o0p0987654",
+            //     address: "0xdfghe78590567890",
+            //     createtime: "44345435",
+            // }
+            try {
+                Firestore.writeTokenInfo({
+                    name: this.token.name,
+                    symbol: this.token.symbol,
+                    decimals: this.token.decimals,
+                    totalSupply: this.token.totalSupply,
+                    network: this.token.networkType,
+                    owner: this.token.owner,
+                    address: contractAddress,
+                    createTime: new Date().getTime(),
+                })
+            } catch (e) {
+                this.$log.error(e)
+            }
         }
     },
     destroyed() {
