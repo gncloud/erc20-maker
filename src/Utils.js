@@ -1,6 +1,15 @@
 import Web3 from 'web3'
 
-let web3 = new Web3(window.web3.currentProvider)
+let network = location.host.substring(0, location.host.indexOf('.')) || 'ropsten'
+const infuraUrl = `https://${network}.infura.io/v3/34808b9f35c641dd873d0b9f89f4e9e7`
+let web3 = null
+try {
+    web3 = new Web3(window.web3.currentProvider)
+} catch(e) {
+    web3 = new Web3(Web3.providers.HttpProvider(infuraUrl))
+    // this.$log.error(e)
+}
+
 // const pollWeb3 = () => {
 //     web3 = new Web3(window.web3.currentProvider)
 //     setTimeout(pollWeb3, 700)
@@ -9,13 +18,13 @@ let web3 = new Web3(window.web3.currentProvider)
 
 class Utils {
     constructor() {
-        this.network = location.host.substring(0, location.host.indexOf('.')) || 'ropsten'
+        this.network = network
     }
-    getWeb3Url() {
-        return `https://${this.network}.infura.io/v3/34808b9f35c641dd873d0b9f89f4e9e7`
-    }
+    // getWeb3Url() {
+    //     return `https://${this.network}.infura.io/v3/34808b9f35c641dd873d0b9f89f4e9e7`
+    // }
     async rpc(method, params) {
-        let res = await fetch(this.getWeb3Url(), {
+        let res = await fetch(infuraUrl, {
             method: 'POST',
             headers: { "Content-Type" : "application/json" },
             body: JSON.stringify({

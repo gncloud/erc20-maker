@@ -147,34 +147,29 @@ export default {
         async pollWeb3() {
             try {
                 this.web3 = Utils.getWeb3()
-                this.token.owner = await this.web3.eth.getCoinbase()
+                
+                this.networkTypeText   = '연결안됨'
+                this.token.networkType = '연결안됨'
+                this.token.owner     = '연결안됨'
+                this.token.ownerText = '연결안됨'
                 this.token.networkType = await this.web3.eth.net.getNetworkType()
+                this.token.networkType = this.token.networkType == 'main' ? 'mainnet' : this.token.networkType
+                this.networkTypeText = Utils.capitalizeFirstLetter(this.token.networkType)
+
+                this.token.owner = await this.web3.eth.getCoinbase()
                 if (this.$refs.ownerLink) {
                     this.$refs.ownerLink.setAttribute('href', Utils.link('address', this.token.owner))
                 }
                 this.token.ownerText = Utils.shortHash(this.token.owner)
                 
-                this.token.networkType = this.token.networkType == 'main' ? 'mainnet' : this.token.networkType
-                if (this.token.networkType === null || this.token.networkType === '') {
-                    this.networkTypeText = '연결안됨'
-                } else {
-                    this.networkTypeText = Utils.capitalizeFirstLetter(this.token.networkType)
-                }
-                
                 if (this.token.ownerText !== '') {
                     this.isMetaMaskReady = true
-                } else {
-                    this.token.ownerText = '연결안됨'
                 }
             } catch(e) {
                 this.isMetaMaskReady = false
-                this.networkTypeText = '연결안됨'
-                this.token.ownerText = '연결안됨'
                 this.$refs.ownerLink = ''
                 this.token.owner = ''
                 this.$log.error(e)
-            } finally {
-                this.eventCode = setTimeout(this.pollWeb3, 1000)
             }
         },
         next() {

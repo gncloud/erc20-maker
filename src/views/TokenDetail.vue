@@ -155,23 +155,23 @@ export default {
         },
         async getWallet() {
             try {
+                this.networkTypeText = '연결안됨'
                 this.token.networkType = await this.web3.eth.net.getNetworkType()
+                
+                this.coinbaseText = '연결안됨'
                 this.coinbase = Utils.shortHash(await this.web3.eth.getCoinbase())
-                this.coinbaseText = Utils.shortHash(this.coinbase)
-                if(this.coinbaseText === '') {
-                    this.coinbaseText = '연결안됨'
+                if(this.coinbaseText !== '') {
+                    this.coinbaseText = Utils.shortHash(this.coinbase)
                 }
                 this.token.networkType = this.token.networkType == 'main' ? 'mainnet' : this.token.networkType
-                if (this.token.networkType === null || this.token.networkType === '') {
-                    this.networkTypeText = '연결안됨'
-                } else {
+                if (this.token.networkType !== null) {
                     this.networkTypeText = Utils.capitalizeFirstLetter(this.token.networkType)
                 }
             } catch(e) {
                 this.coinbaseText = '연결안됨'
                 this.$log.debug(e)
             } finally {
-                setTimeout(this.getWallet, 1000)
+                // setTimeout(this.getWallet, 1000)
             }
         },
         goForm() {

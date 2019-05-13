@@ -20,6 +20,22 @@
         <div class="mt-5">
             <b-button variant="primary" @click="goForm()">만들기</b-button>
         </div>
+
+        <div class="mt-5">
+            <h4>나의 코인</h4>
+        </div>
+        <b-table class="table mt-5" :fields="tokenFields" :items="myItems" hover :show-empty="myItems.length == 0">
+            <template slot="empty" slot-scope="scope">
+            <h4>생성한 토큰이 없습니다.</h4>
+            </template>
+            <template slot="symbol" slot-scope="scope">
+                <b-link target="_black" :href="scope.item.contractAddressUrl">{{ scope.value }}</b-link>
+            </template>
+            <template slot="ownerText" slot-scope="scope">
+                <b-link target="_black" :href="scope.item.ownerUrl">{{ scope.value }}</b-link>
+            </template>
+        </b-table>
+
         <div class="mt-5">
             <h4>신규 발행 코인들</h4>
         </div>
@@ -56,18 +72,43 @@ export default {
                 { key: 'symbol',     label: '심볼',     sortable: false },
                 { key: 'name',       label: '이름',     sortable: false },
                 { key: 'ownerText',  label: '소유자',    sortable: false },
-                { key: 'decimals',   label: '소수점',    sortable: false },
+                // { key: 'decimals',   label: '소수점',    sortable: false },
                 { key: 'initSupply', label: '초기발행량', sortable: false },
-                { key: 'createTime', label: '생성일자',   sortable: false },
+                // { key: 'createTime', label: '생성일자',   sortable: false },
             ],
-            items: []
+            items: [],
+            myItems: []
         }
     },
     created() {
-        this.checkNetwork()
         this.getTokenList()
+        this.checkNetwork()
+        this.getMyTokenList()
     },
     methods: {
+        async getMyTokenList(coinbase) {
+            if (coinbase === null || coinbase == '') {
+                return false
+            }
+            let docs = await Firestore.getTokenList(Utils.network, coinbase)
+            this.myItems = docs.map(doc => {
+                let token = doc.data()
+                return {
+                    name: token.name,
+                    symbol: token.symbol,
+                    owner: token.owner,
+                    ownerUrl: Utils.link('address', token.owner),
+                    ownerText: Utils.shortHash(token.owner),
+                    decimals: token.decimals,
+                    networkType: token.network,
+                    contractAddress: token.address,
+                    contractAddressUrl: `/tokens/${token.address}`,
+                    contractAddressText: Utils.shortHash(token.address),
+                    initSupply: Utils.comma(token.totalSupply),
+                    createTime: Utils.timeStampToDate(token.createTime)
+                }
+            })
+        },
         async getTokenList() {
             let docs = await Firestore.getTokenList(Utils.network)
             this.items = docs.map(doc => {
@@ -81,13 +122,12 @@ export default {
                     decimals: token.decimals,
                     networkType: token.network,
                     contractAddress: token.address,
-                    contractAddressUrl: Utils.link('address', token.address),
+                    contractAddressUrl: `/tokens/${token.address}`,
                     contractAddressText: Utils.shortHash(token.address),
                     initSupply: Utils.comma(token.totalSupply),
                     createTime: Utils.timeStampToDate(token.createTime)
                 }
             })
-            this.$log.debug('tokens', this.items)
         },
         goForm() {
             location.href = '/tokens/new'
@@ -98,18 +138,20 @@ export default {
             try {
                 let web3 = Utils.getWeb3()
                 this.networkType = await web3.eth.net.getNetworkType()
-                this.coinbase = Utils.shortHash(await web3.eth.getCoinbase())
+                let tmpCoinbase = await web3.eth.getCoinbase()
+                this.coinbase = Utils.shortHash(tmpCoinbase)
+                this.getMyTokenList(tmpCoinbase)
                 this.networkType = this.networkType == 'main' ? 'mainnet' : this.networkType
                 if (network != this.networkType) {
                     location.href = `https://${this.networkType}.gncloud.io/tokens`
                 }
                 this.networkTypeText = Utils.capitalizeFirstLetter(this.networkType)
-                if (this.owner == '') {
-                    this.owner = '연결안됨'
+                if (this.coinbase == '') {
+                    this.coinbase = '연결안됨'
                 }
             } catch(e) {
                 this.$log.debug(e)
-                this.owner = '연결안됨'
+                this.coinbase = '연결안됨'
                 this.networkTypeText = '연결안됨'
             } finally {
                 setTimeout(this.checkNetwork, 1000)
