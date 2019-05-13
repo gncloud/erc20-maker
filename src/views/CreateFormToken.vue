@@ -209,7 +209,7 @@ export default {
             isAdditional: 'accepted',
             totalSupply: null,
             gasLimit: 2100000,
-            gasPrice: 10,
+            gasPrice: 3,
             networkType: null,
             owner: null,
             metamaskError: null,
