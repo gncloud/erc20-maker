@@ -31,9 +31,9 @@
             <template slot="symbol" slot-scope="scope">
                 <b-link target="_black" :href="scope.item.contractAddressUrl">{{ scope.value }}</b-link>
             </template>
-            <template slot="ownerText" slot-scope="scope">
+            <!-- <template slot="ownerText" slot-scope="scope">
                 <b-link target="_black" :href="scope.item.ownerUrl">{{ scope.value }}</b-link>
-            </template>
+            </template> -->
         </b-table>
 
         <div class="mt-5">
@@ -43,9 +43,9 @@
             <template slot="symbol" slot-scope="scope">
                 <b-link target="_black" :href="scope.item.contractAddressUrl">{{ scope.value }}</b-link>
             </template>
-            <template slot="ownerText" slot-scope="scope">
+            <!-- <template slot="ownerText" slot-scope="scope">
                 <b-link target="_black" :href="scope.item.ownerUrl">{{ scope.value }}</b-link>
-            </template>
+            </template> -->
         </b-table>
 
         <div class="mastfoot mt-5">
@@ -71,10 +71,7 @@ export default {
             tokenFields: [
                 { key: 'symbol',     label: '심볼',     sortable: false },
                 { key: 'name',       label: '이름',     sortable: false },
-                { key: 'ownerText',  label: '소유자',    sortable: false },
-                // { key: 'decimals',   label: '소수점',    sortable: false },
-                { key: 'initSupply', label: '초기발행량', sortable: false },
-                // { key: 'createTime', label: '생성일자',   sortable: false },
+                { key: 'initSupply', label: '발행량', sortable: false }
             ],
             items: [],
             myItems: []
@@ -83,7 +80,6 @@ export default {
     created() {
         this.getTokenList()
         this.checkNetwork()
-        this.getMyTokenList()
     },
     methods: {
         async getMyTokenList(coinbase) {
@@ -108,6 +104,10 @@ export default {
                     createTime: Utils.timeStampToDate(token.createTime)
                 }
             })
+
+            this.$log.debug('myItems>>', this.myItems)
+
+
         },
         async getTokenList() {
             let docs = await Firestore.getTokenList(Utils.network)
@@ -154,7 +154,7 @@ export default {
                 this.coinbase = '연결안됨'
                 this.networkTypeText = '연결안됨'
             } finally {
-                setTimeout(this.checkNetwork, 1000)
+                setTimeout(this.checkNetwork, 5000)
             }
             
         },

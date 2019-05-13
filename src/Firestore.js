@@ -33,16 +33,20 @@ class Firestore {
     async getTokenList(networkType = null, coinbase = null, size = 10) {
         let result = null
         try {
-            var erc20Ref = this.db.collection("erc20")
-            if (networkType !== null) {
-                erc20Ref.where('network', '==', networkType)
+            let erc20Ref = this.db.collection("erc20")
+            let query = null
+            if (networkType !== null && coinbase !== null) {
+                console.log('networkType >>', networkType)
+                query = erc20Ref.where('owner', '==', coinbase)
+                                .where('network', '==', networkType)                
+                                .orderBy("createTime", "desc")
+                                .limit(size)
+            } else {
+                query = erc20Ref.where('network', '==', networkType)
+                                .orderBy("createTime", "desc")
+                                .limit(size)
             }
-            if (coinbase !== null) {
-                erc20Ref.where('owner', '==', coinbase)
-            }
-            var list = erc20Ref.orderBy("createTime", "desc")
-                               .limit(size);
-            result = await list.get()
+            result = await query.get()
         } catch(e) {
             this.$log.error(e)
         }
