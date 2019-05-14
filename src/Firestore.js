@@ -36,7 +36,6 @@ class Firestore {
             let erc20Ref = this.db.collection("erc20")
             let query = null
             if (networkType !== null && coinbase !== null) {
-                console.log('networkType >>', networkType)
                 query = erc20Ref.where('owner', '==', coinbase)
                                 .where('network', '==', networkType)                
                                 .orderBy("createTime", "desc")

@@ -9,7 +9,14 @@ try {
     web3 = new Web3(Web3.providers.HttpProvider(infuraUrl))
     // this.$log.error(e)
 }
-
+const duration = {
+    seconds: (val) => { return val; },
+    minutes: (val) => { return val * duration.seconds(60); },
+    hours:   (val) => { return val * duration.minutes(60); },
+    days:    (val) => { return val * duration.hours(24); },
+    weeks:   (val) => { return val * duration.days(7); },
+    years:   (val) => { return val * duration.days(365); },
+}
 // const pollWeb3 = () => {
 //     web3 = new Web3(window.web3.currentProvider)
 //     setTimeout(pollWeb3, 700)
@@ -71,6 +78,7 @@ class Utils {
     capitalizeFirstLetter(string) {
         return string.charAt(0).toUpperCase() + string.slice(1)
     }
+    duration = duration
 }
 
 export default new Utils()

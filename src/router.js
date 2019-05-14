@@ -6,6 +6,7 @@ import CreateFormToken from './views/CreateFormToken'
 import CreateTokenConfirm from './views/CreateTokenConfirm'
 // import CreateToken from './views/CreateToken'
 import TokenList from './views/TokenList'
+import CreateCrowdSaleConfirm from './views/CreateCrowdSaleConfirm'
 
 Vue.use(Router)
 
@@ -32,14 +33,18 @@ export default new Router({
                 token: true
             }
         },
-        // {
-        //     path: "/tokens/create",
-        //     name: "CreateToken",
-        //     component: CreateToken,
-        //     props: {
-        //         token: true
-        //     }
-        // },
+        
+        // test
+        {
+            path: "/tokens/test",
+            name: "CreateCrowdSaleConfirm",
+            component: CreateCrowdSaleConfirm,
+            props: {
+                token: true
+            }
+        },
+
+
         {
             path: "/tokens/:token",
             name: "TokenDetail",

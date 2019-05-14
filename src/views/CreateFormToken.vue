@@ -217,7 +217,7 @@ export default {
         }
     },
     created() {
-        this.checkNetwork()
+        this.isMetamask()
         if (Object.keys(this.$route.params).length != 0) {
             this.name = this.$route.params.name
             this.symbol = this.$route.params.symbol
@@ -236,6 +236,16 @@ export default {
         // })
     },
     methods: {
+        async isMetamask() {
+            try {
+                if (window.ethereum) {
+                    window.ethereum.enable()
+                    this.checkNetwork()
+                }
+            } catch(e) {
+                this.$log.error(e)
+            }
+        },
         async checkNetwork() {
             const host = location.host
             let network = host.substring(0, host.indexOf('.')).toLowerCase() || "ropsten"

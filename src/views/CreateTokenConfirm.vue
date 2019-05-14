@@ -122,6 +122,7 @@ export default {
         Loading
     },
     created() {
+        this.isMetamask()
         if(Object.keys(this.$route.params).length === 0) {
             this.$router.push('/tokens/new')
         }
@@ -131,6 +132,15 @@ export default {
         this.pollWeb3()
     },
     methods: {
+        async isMetamask() {
+            try {
+                if (window.ethereum) {
+                    window.ethereum.enable()
+                }
+            } catch(e) {
+                this.$log.error(e)
+            }
+        },
         setToken() {
             this.token.name = this.$route.params.name
             this.token.symbol = this.$route.params.symbol
