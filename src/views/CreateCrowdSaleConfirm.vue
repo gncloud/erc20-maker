@@ -36,7 +36,7 @@ export default {
             location.href="/tokens/new"
         },
         async pending() {
-            // crowdsale contract addr "0x8c67116a00fA4E89827DE13f06DFeAc83e49CE52"
+            // crowdsale contract addr "0xf6901b1e5235B0eE7C70861B3CE5787A4A75dC0a"
             // token contract addr "0x59eda5791Db70059636Ae46D333E58e82AC18303"
             // this.web3 = Utils.getWeb3()
             // const { abi, bytecode } = require('../templates/CrowdSaleTemplate.json')

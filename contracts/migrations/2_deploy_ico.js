@@ -42,7 +42,9 @@ module.exports = async function(deployer, network, accounts) {
     console.log('Contracts deployed: \n', deployedCrowdsale.address, deployedToken.address)
     return true;
   })
-
+//   aa 0xFB421C2E475DE4b37f4C033Aed0eF056b2D7Ee42
+//   Contracts deployed:
+//    0xFB421C2E475DE4b37f4C033Aed0eF056b2D7Ee42 0xEE577E3D6BD897edbf205961F29f15E0B27210CE
 
 
 };
