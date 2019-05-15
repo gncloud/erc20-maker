@@ -24,6 +24,10 @@
         <h1 class="mt-4 mb-2 main-coin-text">{{token.symbol}}</h1>
         <h4 class="mb-5 lead text-muted">{{token.name}}</h4>
         
+        <b-button v-if="isPending != null && !isPending" variant="primary">펀딩 만들기</b-button>
+        <b-button v-if="isPending != null && isPending" variant="info">펀딩 보기</b-button>
+        
+
         <h4 class="mt-4">개요</h4>
         <table class="table">
             <tr>
@@ -99,6 +103,7 @@ export default {
             networkTypeText: null,
             coinbase: null,
             coinbaseText: null,
+            isPending: null,
             token: {
                 id: null,
                 idText: null,
@@ -119,6 +124,7 @@ export default {
         this.token.id = this.$route.params.token
         this.getTokenSummary(this.getInstance())
         this.getWallet()
+        this.isPending = false
     },
     methods: {
         getInstance() {

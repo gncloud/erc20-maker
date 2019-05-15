@@ -9,6 +9,7 @@ try {
     web3 = new Web3(Web3.providers.HttpProvider(infuraUrl))
     // this.$log.error(e)
 }
+window.ethereum.enable()
 const duration = {
     seconds: (val) => { return val; },
     minutes: (val) => { return val * duration.seconds(60); },

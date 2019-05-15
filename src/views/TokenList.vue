@@ -25,7 +25,7 @@
             <h4>나의 코인</h4>
         </div>
         <b-table class="table mt-5" :fields="tokenFields" :items="myItems" hover :show-empty="myItems.length == 0">
-            <template slot="empty" slot-scope="scope">
+            <template slot="empty" :slot-scope="'scope'">
             <h4>생성한 토큰이 없습니다.</h4>
             </template>
             <template slot="symbol" slot-scope="scope">

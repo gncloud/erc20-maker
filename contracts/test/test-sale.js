@@ -48,20 +48,22 @@ contract("SampleToken", function([_, owner, investor]) {
     const openingTime = timeNow  + duration.seconds(30);
     const closingTime = timeNow  + duration.years(1);
     
-    sale = CrowdsaleTemplate.new(rate, owner, token.address, openingTime, closingTime, cap)
-    await token.transferOwnership(owner);
-    console.log(`Created Sale.`)
+    sale = await CrowdsaleTemplate.new(
+      1000,
+      owner,
+      token.address,
+      openingTime,
+      closingTime,
+      1000000
+    )
 
-
-    console.log(`
-      ====================== Buy Tokens ===========================
-    `)
-    let result = await sale.send(owner)
-    console.log('result >>', result)
+    await token.transferOwnership(sale.address)
+ 
 
 
 
   });
+  
   it("", true)
 
 
