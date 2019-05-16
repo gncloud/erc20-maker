@@ -24,8 +24,11 @@
         <h1 class="mt-4 mb-2 main-coin-text">{{token.symbol}}</h1>
         <h4 class="mb-5 lead text-muted">{{token.name}}</h4>
         
-        <b-button v-if="isPending != null && !isPending" variant="primary">펀딩 만들기</b-button>
-        <b-button v-if="isPending != null && isPending" variant="info">펀딩 보기</b-button>
+        <div>
+            <b-button v-if="isFunding != null && !isFunding" variant="primary" @click="goCreateFund()">펀딩 만들기</b-button>
+            <b-button v-if="isFunding != null && isFunding" variant="info" @click="goFundDetail()">펀딩 보기</b-button>
+        </div>
+        
         
 
         <h4 class="mt-4">개요</h4>
@@ -93,6 +96,7 @@
 <script>
 import { abi } from '../templates/MintableTokenTemplate'
 import Utils from '../Utils'
+import Firestore from '../Firestore'
 
 export default {
     name: 'TokenDetail',
@@ -103,7 +107,7 @@ export default {
             networkTypeText: null,
             coinbase: null,
             coinbaseText: null,
-            isPending: null,
+            isFunding: null,
             token: {
                 id: null,
                 idText: null,
@@ -124,9 +128,19 @@ export default {
         this.token.id = this.$route.params.token
         this.getTokenSummary(this.getInstance())
         this.getWallet()
-        this.isPending = false
+        this.getFundInfo()
     },
     methods: {
+        async getFundInfo() {
+            this.docs = await Firestore.getList('fund', Utils.network, this.token.owner)
+            if (this.docs.length == 0) {
+                this.isFunding = null
+            } else if (this.token.owner === this.coinbase) {
+                this.isFunding = false
+            } else {
+                this.isFunding = true
+            }
+        },
         getInstance() {
             let instance = null
             try {
@@ -141,6 +155,7 @@ export default {
             this.token.name        = await instance.methods.name().call()
             this.token.symbol      = await instance.methods.symbol().call()
             this.token.owner       = await instance.methods.owner().call()
+            this.$log.debug('token owner >>', this.token.owner)
             this.token.totalSupply = Utils.comma(await instance.methods.totalSupply().call() || 0)
             this.token.decimals    = Utils.comma(await instance.methods.decimals().call() || 0)
             
@@ -165,7 +180,8 @@ export default {
                 this.token.networkType = await this.web3.eth.net.getNetworkType()
                 
                 this.coinbaseText = '연결안됨'
-                this.coinbase = Utils.shortHash(await this.web3.eth.getCoinbase())
+                this.coinbase = await this.web3.eth.getCoinbase()
+                this.$log.debug('coinbase', this.coinbase)
                 if(this.coinbaseText !== '') {
                     this.coinbaseText = Utils.shortHash(this.coinbase)
                 }
@@ -182,6 +198,20 @@ export default {
         },
         goForm() {
             location.href="/tokens/new"
+        },
+        goCreateFund() {
+            this.$router.push({
+              name: 'CreateFundForm',
+              params: {
+                  contract: this.token.id
+              }  
+            })
+        },
+        goFundDetail() {
+            this.docs.forEach(f => {
+                this.$log.debug(f)
+            })
+            this.$router.push(`/fund/${this.token.id}`)
         }
     }
 }

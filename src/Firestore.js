@@ -10,7 +10,7 @@ class Firestore {
           })
           this.db = firebase.firestore()
     }
-    async writeTokenInfo(tokenInfo) {
+    async writeTokenInfo(collection, tokenInfo) {
         // {
         //     name: "AdaAda2",
         //     symbol: "Ada2",
@@ -23,30 +23,31 @@ class Firestore {
         // }
         let result = null
         try {
-            result = await this.db.collection("erc20").add(tokenInfo)
+            result = await this.db.collection(collection).add(tokenInfo)
         } catch (e) {
             this.$log.error(e)
         }
         return result
     }
 
-    async getTokenList(networkType = null, coinbase = null, size = 10) {
+    async getList(collection, networkType = null, coinbase = null, size = 10) {
         let result = null
         try {
-            let erc20Ref = this.db.collection("erc20")
+            let ref = this.db.collection(collection)
             let query = null
             if (networkType !== null && coinbase !== null) {
-                query = erc20Ref.where('owner', '==', coinbase)
+                query = ref.where('owner', '==', coinbase)
                                 .where('network', '==', networkType)                
                                 .orderBy("createTime", "desc")
                                 .limit(size)
-            } else {
-                query = erc20Ref.where('network', '==', networkType)
+            } else if (networkType !== null) {
+                query = ref.where('network', '==', networkType)
                                 .orderBy("createTime", "desc")
                                 .limit(size)
             }
             result = await query.get()
         } catch(e) {
+            console.log(e)
             this.$log.error(e)
         }
         return await result.docs

@@ -24,7 +24,7 @@ export default new Router({
         { path: "/fund", name: "FundList", component: FundList, props: false },
         { path: "/fund/new", name: "CreateFundForm", component: CreateFundForm, props: false },
         { path: "/fund/confirm", name: "CreateFundConfirm", component: CreateFundConfirm, props: false },
-        { path: "/fund/:token", name: "FundDetail", component: FundDetail, props: false },
+        { path: "/fund/:addr", name: "FundDetail", component: FundDetail, props: false },
         
     ]
 })

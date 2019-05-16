@@ -273,7 +273,7 @@ export default {
             //     createtime: "44345435",
             // }
             try {
-                Firestore.writeTokenInfo({
+                Firestore.writeTokenInfo('erc20', {
                     name: this.token.name,
                     symbol: this.token.symbol,
                     decimals: this.token.decimals,

@@ -6,7 +6,7 @@
             <span class="service-name">펀딩 생성</span>
         </div>
         <div class="text-center my-3 wallet-info">
-            <b-button :variant="networkTypeText === 'Mainnet' ? 'outline-success' : 'outline-danger'" 
+            <b-button :variant="networkType === 'Mainnet' ? 'outline-success' : 'outline-danger'" 
                       v-b-popover.hover="`지갑주소: ${coinbase}`" >
                 {{networkTypeText}}
             </b-button>
@@ -190,7 +190,7 @@
                                 ref="gasPrice"
                                 type="number"
                                 required
-                                placeholder="10"
+                                placeholder="3"
                                 v-model="fund.gasPrice"
                                 name="gasPrice"
                                 v-validate="{ required: true, numeric: true, min: 1}"
@@ -249,27 +249,62 @@
     </b-container>
 </template>
 <script>
-// import Utils from '../Utils'
+import Utils from '../Utils'
 
 export default {
     name: 'CreateFundForm',
     data() {
         return {
-            networkTypeText: null,
-            coinbase: null,
+            networkType: null,
+            networkTypeText: '연결안됨',
+            coinbase: '연결안됨',
             fund: {
+                contract: null,
                 coinbase: null,
+                rate: null,
+                cap: null,
+                maxSize: null,
+                open: null,
+                close: null,
                 gasPrice: 3,
                 gasLimit: 2100000
             }
         }
     },
     created() {
-        if(this.$route.params) {
-            this.fund = this.$route.params
-        } 
+        this.fund = Object.assign(this.fund, this.$route.params)
+        this.networkType = Utils.network
+        this.metamask()
     },
     methods: {
+        async metamask() {
+            let web3 = Utils.getWeb3()
+            try {
+                this.networkTypeText = Utils.capitalizeFirstLetter(await web3.eth.net.getNetworkType())
+                if (this.networkTypeText === '') {
+                    throw Error('Not Connection')
+                }
+            } catch(e) {
+                this.$log.error(e)
+                this.networkTypeText = '연결안됨'
+            }
+            try {
+                let coinbase = await web3.eth.getCoinbase()
+                if (this.fund.coinbase === null) {
+                    this.fund.coinbase = coinbase
+                }
+                this.coinbase = Utils.shortHash(coinbase)
+                coinbase
+                if (this.coinbase === '') {
+                    throw Error('Not Connection')
+                }
+            } catch(e) {
+                this.$log.error(e)
+                this.coinbase = '연결안됨'
+            }
+
+            setTimeout(this.metamask, 5000)
+        },
         toggleAdvancedOptions() {
             this.$refs.AdvancedOptions.classList.toggle('d-none')
         },

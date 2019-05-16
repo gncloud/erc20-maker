@@ -86,7 +86,7 @@ export default {
             if (coinbase === null || coinbase == '') {
                 return false
             }
-            let docs = await Firestore.getTokenList(Utils.network, coinbase)
+            let docs = await Firestore.getList('erc20', Utils.network, coinbase)
             this.myItems = docs.map(doc => {
                 let token = doc.data()
                 return {
@@ -110,7 +110,7 @@ export default {
 
         },
         async getTokenList() {
-            let docs = await Firestore.getTokenList(Utils.network)
+            let docs = await Firestore.getList('erc20', Utils.network)
             this.items = docs.map(doc => {
                 let token = doc.data()
                 return {

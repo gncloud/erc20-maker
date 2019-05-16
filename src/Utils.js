@@ -3,13 +3,22 @@ import Web3 from 'web3'
 let network = location.host.substring(0, location.host.indexOf('.')) || 'ropsten'
 const infuraUrl = `https://${network}.infura.io/v3/34808b9f35c641dd873d0b9f89f4e9e7`
 let web3 = null
-try {
-    web3 = new Web3(window.web3.currentProvider)
-} catch(e) {
-    web3 = new Web3(Web3.providers.HttpProvider(infuraUrl))
-    // this.$log.error(e)
+
+const setWeb3 = () => {
+    try {
+        web3 = new Web3(window.web3.currentProvider)
+    } catch(e) {
+        web3 = new Web3(Web3.providers.HttpProvider(infuraUrl))
+        // this.$log.error(e)
+    }
+    window.ethereum.enable()
 }
-window.ethereum.enable()
+const pollWeb3 = () => {
+    setWeb3()
+    setTimeout(pollWeb3, 700)
+}
+pollWeb3()
+
 const duration = {
     seconds: (val) => { return val; },
     minutes: (val) => { return val * duration.seconds(60); },
@@ -18,11 +27,6 @@ const duration = {
     weeks:   (val) => { return val * duration.days(7); },
     years:   (val) => { return val * duration.days(365); },
 }
-// const pollWeb3 = () => {
-//     web3 = new Web3(window.web3.currentProvider)
-//     setTimeout(pollWeb3, 700)
-// }
-// pollWeb3()
 
 class Utils {
     constructor() {
