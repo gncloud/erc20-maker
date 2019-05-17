@@ -279,7 +279,7 @@ export default {
                     decimals: this.token.decimals,
                     totalSupply: this.token.totalSupply,
                     network: this.token.networkType,
-                    owner: this.token.owner,
+                    owner: this.token.owner.toLowerCase(),
                     address: contractAddress,
                     createTime: new Date().getTime(),
                 })

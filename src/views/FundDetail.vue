@@ -5,7 +5,7 @@
             <div class="eth-logo cursor-pointer logo-width m-auto" @click="this.goForm"></div>
             <div>
                 <span class="service-name cursor-pointer"
-                      @click="this.goForm">ERC-20 Token Maker</span>
+                      @click="this.goForm">ERC-20 펀딩</span>
             </div>
         </div>
         <div class="text-center my-3 wallet-info">

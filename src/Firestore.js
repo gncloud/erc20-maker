@@ -29,7 +29,21 @@ class Firestore {
         }
         return result
     }
-
+    async getContract(collection, networkType, coinbase, contract) {
+        let result = null
+        try {
+            let ref = this.db.collection(collection)
+            let query = null
+            query = ref.where('owner', '==', coinbase)
+                       .where('network', '==', networkType)
+                       .where('contract', '==', contract)
+            result = await query.get()
+        } catch(e) {
+            console.log(e)
+            this.$log.error(e)
+        }
+        return await result.docs
+    }
     async getList(collection, networkType = null, coinbase = null, size = 10) {
         let result = null
         try {
@@ -37,7 +51,7 @@ class Firestore {
             let query = null
             if (networkType !== null && coinbase !== null) {
                 query = ref.where('owner', '==', coinbase)
-                                .where('network', '==', networkType)                
+                                .where('network', '==', networkType)
                                 .orderBy("createTime", "desc")
                                 .limit(size)
             } else if (networkType !== null) {

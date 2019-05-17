@@ -132,13 +132,20 @@ export default {
     },
     methods: {
         async getFundInfo() {
-            this.docs = await Firestore.getList('fund', Utils.network, this.token.owner)
-            if (this.docs.length == 0) {
-                this.isFunding = null
-            } else if (this.token.owner === this.coinbase) {
-                this.isFunding = false
-            } else {
+            if (this.token.owner === null) {
+                setTimeout(this.getFundInfo, 1000)
+                return false
+            }
+            this.docs = await Firestore.getContract('fund', Utils.network, this.token.owner.toLowerCase(), this.token.id)
+            if (this.docs.length > 0) {
                 this.isFunding = true
+            } else {
+                let owner = this.token.owner
+                let coinbase = this.coinbase
+                if (owner !== null && coinbase !== null 
+                    && owner.toLowerCase() === coinbase.toLowerCase()) {
+                    this.isFunding = false
+                }
             }
         },
         getInstance() {
@@ -208,10 +215,11 @@ export default {
             })
         },
         goFundDetail() {
-            this.docs.forEach(f => {
-                this.$log.debug(f)
-            })
-            this.$router.push(`/fund/${this.token.id}`)
+            if (this.docs.length == 0) {
+                return false
+            }
+            let fundContract = this.docs[0].data().fundContract
+            this.$router.push(`/fund/${fundContract}`)
         }
     }
 }

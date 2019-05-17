@@ -28,9 +28,9 @@
             <template slot="empty" :slot-scope="'scope'">
                 <h4>생성한 펀딩이 없습니다.</h4>
             </template>
-            <!-- <template slot="symbol" slot-scope="scope">
+            <template slot="symbol" slot-scope="scope">
                 <b-link target="_black" :href="scope.item.contractAddressUrl">{{ scope.value }}</b-link>
-            </template> -->
+            </template>
         </b-table>
 
         <div class="mt-5">
@@ -127,7 +127,7 @@ export default {
                     contractAddressText: Utils.shortHash(fund.contract),
                     createTime: Utils.timeStampToDate(fund.createTime),
                     cap: Utils.comma(fund.cap),
-                    state: '대기'
+                    state: 'N/A'
                 }
             })
             this.$log.debug(this.items)
@@ -149,7 +149,7 @@ export default {
                     contractAddressText: Utils.shortHash(fund.contract),
                     createTime: Utils.timeStampToDate(fund.createTime),
                     cap: Utils.comma(fund.cap),
-                    state: '대기'
+                    state: 'N/A'
                 }
             })
         }

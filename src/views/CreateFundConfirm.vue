@@ -172,13 +172,6 @@ export default {
             this.fund.symbol      = await instance.methods.symbol().call()
         },
         async next() {
-            Firestore.writeTokenInfo('fund', {
-                fundContract: '0x345h6ejw45q3t3g567e5jw4h',
-                network: this.networkType,
-                createTime: new Date().getTime(),
-                owner: this.fund.coinbase,
-                ...this.fund
-            })
             
             if (!this.isReady) {
                 alert('메타마스크와 연결되지 않았습니다.')

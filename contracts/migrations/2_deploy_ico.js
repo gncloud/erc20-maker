@@ -20,28 +20,22 @@ module.exports = async function(deployer, network, accounts) {
     // string memory symbol,
     // uint8 decimals,
     // uint256 totalSupply
-  deployer.deploy(MintableTokenTemplate, "Test Token", "TTC", 18, 10000000000).then(async () => {
-    // const deployedToken = await MintableTokenTemplate.deployed();
-    // console.log(deployedToken.address)
+  deployer.deploy(MintableTokenTemplate, "Test Token", "TTC", 18, 1000000000000).then(async () => {
+    const deployedToken = await MintableTokenTemplate.deployed();
+    console.log(deployedToken.address)
     
-    // const rate = 1000;
-    // const wallet = accounts[0];
-    // const timeNow = Math.floor(Date.now() / 1000);
-    // const openingTime = timeNow  + duration.seconds(30);
-    // const closingTime = timeNow  + duration.years(1);
-    // const cap = 100000;
+    const rate = 1;
+    const wallet = accounts[0];
+    const timeNow = Math.floor(Date.now() / 1000);
+    const openingTime = timeNow  + duration.seconds(30);
+    const closingTime = timeNow  + duration.years(1);
+    const cap = 1000000000000;
     
-    // // uint256 _rate,
-    // // address payable _wallet,
-    // // ERC20 _token,
-    // // uint256 _openingTime,
-    // // uint256 _closingTime,
-    // // uint256 _cap
-    // await deployer.deploy(CrowdsaleTemplate, rate, wallet, deployedToken.address, openingTime, closingTime, cap);
-    // const deployedCrowdsale = await CrowdsaleTemplate.deployed();
-    // console.log('deployedCrowdsale address: \n', deployedCrowdsale.address);
-    // await deployedToken.transferOwnership(deployedCrowdsale.address);
-    // console.log('Contracts deployed: \n', deployedCrowdsale.address, deployedToken.address)
+    await deployer.deploy(CrowdsaleTemplate, rate, wallet, deployedToken.address, openingTime, closingTime, cap);
+    const deployedCrowdsale = await CrowdsaleTemplate.deployed();
+    console.log('deployedCrowdsale address: \n', deployedCrowdsale.address);
+    await deployedToken.transferOwnership(deployedCrowdsale.address);
+    console.log('Contracts deployed: \n', deployedCrowdsale.address, deployedToken.address)
     return true;
   })
 //   aa 0xFB421C2E475DE4b37f4C033Aed0eF056b2D7Ee42

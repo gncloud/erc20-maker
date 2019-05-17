@@ -5,11 +5,10 @@ import "openzeppelin-solidity/contracts/crowdsale/validation/TimedCrowdsale.sol"
 import "openzeppelin-solidity/contracts/crowdsale/validation/CappedCrowdsale.sol";
 import "openzeppelin-solidity/contracts/crowdsale/emission/MintedCrowdsale.sol";
 import "openzeppelin-solidity/contracts/token/ERC20/ERC20.sol";
-// import "openzeppelin-solidity/contracts/crowdsale/distribution/FinalizableCrowdsale.sol";
+import "openzeppelin-solidity/contracts/crowdsale/distribution/FinalizableCrowdsale.sol";
 
 
-// contract CrowdsaleTemplate is Crowdsale, TimedCrowdsale, CappedCrowdsale, MintedCrowdsale, FinalizableCrowdsale {
-    contract CrowdsaleTemplate is Crowdsale, TimedCrowdsale, CappedCrowdsale, MintedCrowdsale {
+contract CrowdsaleTemplate is Crowdsale, TimedCrowdsale, CappedCrowdsale, MintedCrowdsale, FinalizableCrowdsale {
     constructor(
         uint256 _rate,
         address payable _wallet,
@@ -24,8 +23,4 @@ import "openzeppelin-solidity/contracts/token/ERC20/ERC20.sol";
         public
     {}
     
-    // function () external payable {
-    //     buyTokens(msg.sender);
-    // }
-
 }
