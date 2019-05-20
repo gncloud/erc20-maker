@@ -38,23 +38,24 @@ await web3.eth.getBalance(accounts[0])
 
 
 
+-------------------------------------------------
 
+accounts = await web3.eth.getAccounts()
+web3.eth.defaultAccount = accounts[0]
+let purchaser = accounts[2]
+
+compile
 migrate --reset
 
-
-
-
-let accounts = await web3.eth.getAccounts()
-let purchaser = web3.eth.accounts[2]
 CrowdsaleTemplate.deployed().then(inst => { crowdsale = inst })
 crowdsale.token().then(addr => { tokenAddress = addr } )
 tokenAddress
-MintableTokenTemplate = MintableTokenTemplate.at(tokenAddress)
-MintableTokenTemplate.addMinter(crowdsale.address)
-MintableTokenTemplate.balanceOf(purchaser).then(balance => balance.toString(10))
-CrowdsaleTemplate.deployed().then(inst => inst.sendTransaction({ from: purchaser, value: web3.utils.toWei(5, "ether")}))
 
-MintableTokenTemplate.balanceOf(purchaser).then(balance => purchaserGusTokenBalance = balance.toString(10))
+token = await MintableTokenTemplate.at(tokenAddress)
+token.addMinter(crowdsale.address)
 
-MintableTokenTemplate.balanceOf(purchaser).then(balance => balance.toString(10))
-web3.fromWei(purchaserGusTokenBalance, "ether")
+token.balanceOf(purchaser).then(balance => balance.toString(10))
+
+crowdsale.sendTransaction({ from: purchaser, value: web3.utils.toWei('5', "ether")})
+
+token.balanceOf(purchaser).then(balance => balance.toString(10))

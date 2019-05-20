@@ -1,6 +1,7 @@
-const CrowdSaleTemplate = artifacts.require('./CrowdSaleTemplate.sol');
-const MintableTokenTemplate = artifacts.require('./MintableTokenTemplate.sol');
+const CrowdSaleTemplate = artifacts.require('./CrowdSaleTemplate');
+const MintableTokenTemplate = artifacts.require('./MintableTokenTemplate');
 
+// const GustavoCoin = artifacts.require('./GustavoCoin.sol');
 
 const duration = {
     seconds: function (val) { return val; },
@@ -12,32 +13,29 @@ const duration = {
   };
 
 module.exports = function(deployer, network, accounts) {
-    
+    const timeNow = Math.floor(Date.now() / 1000);
+    const openingTime = timeNow  + duration.seconds(30);
+    const closingTime = timeNow  + duration.years(1);
+    const rate = 1000;
+    const wallet = accounts[1];
+    const cap = 1000000000;
+
+    const name = 'TEST TOKEN'
+    const symbol = 'TTT'
+    const decimals = 0
+    const totalSupply = 1000000
+
     return deployer
         .then(() => {
-            
-            const name = 'TEST TOKEN'
-            const symbol = 'TTT'
-            const decimals = 0
-            const totalSupply = 1000000
-
             return deployer.deploy(
                 MintableTokenTemplate, 
-                name,
-                symbol,
-                decimals,
-                totalSupply
+                // name,
+                // symbol,
+                // decimals,
+                // totalSupply
                 )
         })
-        .then((cloneTokenTemplate) => {
-
-            const timeNow = Math.floor(Date.now() / 1000);
-            const openingTime = timeNow  + duration.seconds(30);
-            const closingTime = timeNow  + duration.years(1);
-            const rate = 1000;
-            const wallet = accounts[1];
-            const cap = 1000000000;
-
+        .then(() => {
             return deployer.deploy(
                 CrowdSaleTemplate,
                 rate,
@@ -45,7 +43,7 @@ module.exports = function(deployer, network, accounts) {
                 openingTime,
                 closingTime,
                 cap,
-                cloneTokenTemplate.address
+                MintableTokenTemplate.address
             );
         });
 };

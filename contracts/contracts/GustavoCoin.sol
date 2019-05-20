@@ -1,9 +1,16 @@
 pragma solidity 0.4.24;
 
 import 'openzeppelin-solidity/contracts/token/ERC20/ERC20Mintable.sol';
+import "openzeppelin-solidity/contracts/ownership/Ownable.sol";
+import "openzeppelin-solidity/contracts/token/ERC20/ERC20Detailed.sol";
 
-contract GustavoCoin is ERC20Mintable {
-    string public name = "GUSTAVO COIN";
-    string public symbol = "GUS";
-    uint8 public decimals = 18;
+contract GustavoCoin is ERC20Detailed, ERC20Mintable, Ownable {
+    constructor(
+        string name,
+        string symbol,
+        uint8 decimals,
+        uint256 totalSupply
+    ) public ERC20Detailed(name, symbol, decimals) {
+        mint(owner(), totalSupply);
+    }
 }

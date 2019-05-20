@@ -21,9 +21,21 @@ module.exports = function(deployer, network, accounts) {
     const rate = 1000;
     const wallet = accounts[1];
 
+
+    const name = 'TEST TOKEN'
+    const symbol = 'TTT'
+    const decimals = 0
+    const totalSupply = 1000000
+    const cap = web3.utils.toWei('1000', 'ether')
     return deployer
         .then(() => {
-            return deployer.deploy(GustavoCoin);
+            return deployer.deploy(
+                GustavoCoin,
+                name,
+                symbol,
+                decimals,
+                totalSupply
+                );
         })
         .then(() => {
             return deployer.deploy(
@@ -32,6 +44,7 @@ module.exports = function(deployer, network, accounts) {
                 closingTime,
                 rate,
                 wallet,
+                cap,
                 GustavoCoin.address
             );
         });
