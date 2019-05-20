@@ -1,0 +1,60 @@
+MTL
+0x59eda5791Db70059636Ae46D333E58e82AC18303
+
+
+crowd: 0x2868159552e69A20c9C28F5ca5A97a8232877f37
+token: 0x79Eb921C6916C512311BcE22349Dd1aB13EbF5f7
+gasPrice: 20000000000
+gas: 6721975
+
+
+
+# 계정 저장
+accounts = await web3.eth.getAccounts()
+web3.eth.defaultAccount = accounts[0]
+web3.eth.defaultAccount
+
+# 배포
+migrate --reset
+
+# 컨트랙트 인스턴스 생성
+CrowdsaleTemplate.deployed().then(inst => { crowdsale = inst } )
+crowdsale.token().then(addr => { tokenAddress = addr } )
+
+// ## MintableTokenTemplate.deployed().then(inst => { token = inst } )
+MintableTokenTemplate.at(tokenAddress).then(ins => { token = ins })
+
+# 전송
+
+crowdsale.sendTransaction({from: accounts[0], value: 1})
+await web3.eth.sendTransaction({from: '0x15A8bE32C164FE5BFe014da926bf14252D38EB46', to: '0x2868159552e69A20c9C28F5ca5A97a8232877f37', value: web3.utils.toWei('1'), gas: 6721975, gasPrice: 20000000000})
+
+
+## 수량 확인
+(await token.totalSupply()).toString(10)
+
+token.balanceOf(accounts[0]).then(b => b.toString(10))
+await web3.eth.getBalance(accounts[0])
+
+
+
+
+migrate --reset
+
+
+
+
+let accounts = await web3.eth.getAccounts()
+let purchaser = web3.eth.accounts[2]
+CrowdsaleTemplate.deployed().then(inst => { crowdsale = inst })
+crowdsale.token().then(addr => { tokenAddress = addr } )
+tokenAddress
+MintableTokenTemplate = MintableTokenTemplate.at(tokenAddress)
+MintableTokenTemplate.addMinter(crowdsale.address)
+MintableTokenTemplate.balanceOf(purchaser).then(balance => balance.toString(10))
+CrowdsaleTemplate.deployed().then(inst => inst.sendTransaction({ from: purchaser, value: web3.utils.toWei(5, "ether")}))
+
+MintableTokenTemplate.balanceOf(purchaser).then(balance => purchaserGusTokenBalance = balance.toString(10))
+
+MintableTokenTemplate.balanceOf(purchaser).then(balance => balance.toString(10))
+web3.fromWei(purchaserGusTokenBalance, "ether")

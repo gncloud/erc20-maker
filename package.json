@@ -37,7 +37,7 @@
     "chai-bignumber": "^3.0.0",
     "eslint": "^5.8.0",
     "eslint-plugin-vue": "^5.0.0",
-    "openzeppelin-solidity": "^2.2.0",
+    "openzeppelin-solidity": "2.0.0",
     "openzeppelin-test-helpers": "^0.3.2",
     "truffle-hdwallet-provider": "^1.0.9",
     "vue-template-compiler": "^2.5.21"

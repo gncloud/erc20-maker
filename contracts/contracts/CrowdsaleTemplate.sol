@@ -1,26 +1,25 @@
-pragma solidity 0.5.2;
+pragma solidity 0.4.24;
 
-import "openzeppelin-solidity/contracts/crowdsale/Crowdsale.sol";
+import './TokenTemplate.sol';
 import "openzeppelin-solidity/contracts/crowdsale/validation/TimedCrowdsale.sol";
 import "openzeppelin-solidity/contracts/crowdsale/validation/CappedCrowdsale.sol";
 import "openzeppelin-solidity/contracts/crowdsale/emission/MintedCrowdsale.sol";
-import "openzeppelin-solidity/contracts/token/ERC20/ERC20.sol";
-import "openzeppelin-solidity/contracts/crowdsale/distribution/FinalizableCrowdsale.sol";
+import "openzeppelin-solidity/contracts/token/ERC20/ERC20Mintable.sol";
 
 
-contract CrowdsaleTemplate is Crowdsale, TimedCrowdsale, CappedCrowdsale, MintedCrowdsale, FinalizableCrowdsale {
+contract CrowdsaleTemplate is TimedCrowdsale, MintedCrowdsale, CappedCrowdsale {
+    
     constructor(
         uint256 _rate,
-        address payable _wallet,
-        ERC20 _token,
+        address _wallet,
         uint256 _openingTime,
         uint256 _closingTime,
-        uint256 _cap
-    )
+        uint256 _cap,
+        ERC20Mintable _token
+    )   
+        public
+        Crowdsale(_rate, _wallet, _token)
         TimedCrowdsale(_openingTime, _closingTime)
         CappedCrowdsale(_cap)
-        Crowdsale(_rate, _wallet, _token)
-        public
     {}
-    
 }
